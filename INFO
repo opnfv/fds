@@ -1,0 +1,22 @@
+Project: FastDataStacks
+Project Creation Date: March 29, 2016 
+Lifecycle State: Incubation
+Primary Contact: Frank Brockners
+Project Lead: Frank Brockners
+Jira Project Name: FastDataStacks 
+Jira Project Prefix: FDS 
+Mailing list tag: [FDS]
+IRC: Server:freenode.net Channel: #opnfv-fds
+Repository: fds 
+
+Committers:
+    Frank Brockners (fbrockne@cisco.com)
+    Wojciech Dec (wdec@cisco.com)
+    Juraj Linkes (jlinkes@cisco.com)
+    Viliam Luc (vluc@cisco.com)
+    Tim Rozet (trozet@redhat.com)
+    Dan Radez (dradez@redhat.com)
+    Ashlee Young (ashlee@yunify.org)
+
+Link to TSC approval of the project: https://wiki.opnfv.org/display/meetings/TSC#TSC-March29,2016 
+Link(s) to approval of additional committers: n/a
