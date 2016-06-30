@@ -1,0 +1,5 @@
+.idea
+*.pyc
+testing/robot/log.html
+testing/robot/output.xml
+testing/robot/report.html

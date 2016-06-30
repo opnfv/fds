@@ -1,0 +1,109 @@
+*** Settings ***
+Library         OperatingSystem
+Library         lib/FDSLibrary.py
+Variables       data/test_data.py
+Suite Setup     Setup Suite
+Suite Teardown  Teardown Suite
+
+*** Variables ***
+
+*** Test Cases ***
+Create network for VMs
+    Create tenant network
+
+Create subnet without dhcp for VMs
+    Create subnet without dhcp
+
+Create port for VM1
+    ${result} =     Create port with ip     ${port1_name}   ${vm1_address}
+    Set Suite Variable  ${port1_id}     ${result}
+
+Create port for VM2
+    ${result} =     Create port with ip     ${port2_name}   ${vm2_address}
+    Set Suite Variable  ${port2_id}     ${result}
+
+Create VM1
+    ${port_ids} =   Create List     ${port1_id}
+    ${result} =     Create vm       ${vm1_name}     ${port_ids}
+    Set Suite Variable  ${vm1_id}   ${result}
+
+Create VM2
+    ${port_ids} =   Create List     ${port2_id}
+    ${result} =     Create vm       ${vm2_name}     ${port_ids}
+    Set Suite Variable  ${vm2_id}   ${result}
+
+Wait for VM1 to be active
+    Should Be True  $vm1_id is not $None
+    Poll vm     ${vm1_id}   active
+
+Wait for VM2 to be active
+    Should Be True  $vm2_id is not $None
+    Poll vm     ${vm2_id}   active
+
+Ping VM1
+    Ping vm     ${vm1_address}
+
+Ping VM2
+    Ping vm     ${vm2_address}
+
+*** Keywords ***
+Setup Suite
+    Set Suite Variable  ${network_id}   ${None}
+    Set Suite Variable  ${subnet_id}    ${None}
+    Set Suite Variable  ${port1_id}     ${None}
+    Set Suite Variable  ${port2_id}     ${None}
+    Set Suite Variable  ${vm1_id}       ${None}
+    Set Suite Variable  ${vm2_id}       ${None}
+
+Teardown Suite
+    Run Keyword If  $vm1_id is not $None        Delete vm       ${vm1_id}
+    Run Keyword If  $vm2_id is not $None        Delete vm       ${vm2_id}
+    Run Keyword If  $port1_id is not $None      Delete ports    ${port1_id}
+    Run Keyword If  $port2_id is not $None      Delete ports    ${port2_id}
+    Run Keyword If  $network_id is not $None    Delete network  ${network_id}
+
+Create tenant network
+    &{response} =   create network  ${network_name}
+    log many    &{response}
+    Set Suite Variable  ${network_id}   ${response.network['id']}
+    log     ${network_id}
+
+Create subnet without dhcp
+    &{response} =   create subnet  ${subnet_name}   ${network_id}   ${subnet_cidr}  dhcp=False
+    log many    &{response}
+    Set Suite Variable  ${subnet_id}    ${response.subnet['id']}
+    log     ${subnet_id}
+
+Create port with ip
+    [Arguments]     ${port_name}    ${ip_address}
+    &{response} =   create port     ${port_name}    ${network_id}   ${subnet_id}    ${ip_address}
+    log many    &{response}
+    log         ${response.port['id']}
+    [Return]    ${response.port['id']}
+
+Create vm
+    [Arguments]     ${vm_name}     ${port_ids}
+    ${response} =   create server   ${vm_name}     ${vm_image}     ${vm_flavor}    ${port_ids}
+    log many    ${response}
+    log         ${response.id}
+    [Return]    ${response.id}
+
+Poll vm
+    [Arguments]     ${id}   ${state}
+    poll server     ${id}   ${state}
+
+Delete vm
+    [Arguments]     ${id}
+    ${response} =   delete server   ${id}
+    log     ${response}
+    Poll vm     ${id}   ${None}
+
+Delete ports
+    [Arguments]     ${id}
+    ${response} =   delete port     ${id}
+    log     ${response}
+
+Delete network
+    [Arguments]     ${id}
+    ${response} =   delete net      ${id}
+    log     ${response}
