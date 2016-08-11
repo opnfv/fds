@@ -166,7 +166,9 @@ store.
 **Virtual Bridge Domain (VBD) Store and Manager**: The virtual bridge domain
 manager is responsible for configuring the VxLAN overlay tunnel infrastructure
 to arrive at a desired bridged topology between multiple (VPP) compute nodes.
-VDB configures VXLAN tunnels always into a full-mesh with split-horizon group forwarding applied on any domain facing tunnel interface (i.e. forwarding behavior will be that used for VPLS).
+VDB configures VXLAN tunnels always into a full-mesh with split-horizon group
+forwarding applied on any domain facing tunnel interface (i.e. forwarding
+behavior will be that used for VPLS).
 
 **NETCONF Mount Point Service & Connector**: Collectively referred to as
 Netconf Services, provide the NETCONF interface for accessing VPP configuration
