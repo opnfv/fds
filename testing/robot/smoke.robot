@@ -1,3 +1,12 @@
+##############################################################################
+# Copyright (c) 2016 Juraj Linkes (Cisco) and others.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
+
 *** Settings ***
 Library         OperatingSystem
 Library         lib/FDSLibrary.py
@@ -24,27 +33,25 @@ Create port for VM2
 
 Create VM1
     ${port_ids} =   Create List     ${port1_id}
-    ${result} =     Create vm       ${vm1_name}     ${port_ids}
+    ${result} =     Create vm       ${vm1_name}     ${port_ids}     userdata=${userdata1}
     Set Suite Variable  ${vm1_id}   ${result}
-
-Create VM2
-    ${port_ids} =   Create List     ${port2_id}
-    ${result} =     Create vm       ${vm2_name}     ${port_ids}
-    Set Suite Variable  ${vm2_id}   ${result}
 
 Wait for VM1 to be active
     Should Be True  $vm1_id is not $None
     Poll vm     ${vm1_id}   active
 
+Create VM2
+    ${port_ids} =   Create List     ${port2_id}
+    ${result} =     Create vm       ${vm2_name}     ${port_ids}     userdata=${userdata2}
+    Set Suite Variable  ${vm2_id}   ${result}
+
 Wait for VM2 to be active
     Should Be True  $vm2_id is not $None
     Poll vm     ${vm2_id}   active
 
-Ping VM1
-    Ping vm     ${vm1_address}
-
-Ping VM2
-    Ping vm     ${vm2_address}
+Check VM2 userdata
+    ${result} =     Check vm console    ${vm2_id}   PASSED
+    Should Be True  ${result}
 
 *** Keywords ***
 Setup Suite
@@ -54,6 +61,12 @@ Setup Suite
     Set Suite Variable  ${port2_id}     ${None}
     Set Suite Variable  ${vm1_id}       ${None}
     Set Suite Variable  ${vm2_id}       ${None}
+    ${result} =     Check Flavor Exists     ${vm_flavor}
+    Log     ${vm_flavor}
+    Should be True      ${result}
+    ${result} =     Check Image Exists  ${vm_image}
+    Log     ${vm_image}
+    Should be True      ${result}
 
 Teardown Suite
     Run Keyword If  $vm1_id is not $None        Delete vm       ${vm1_id}
@@ -82,11 +95,18 @@ Create port with ip
     [Return]    ${response.port['id']}
 
 Create vm
-    [Arguments]     ${vm_name}     ${port_ids}
-    ${response} =   create server   ${vm_name}     ${vm_image}     ${vm_flavor}    ${port_ids}
+    [Arguments]     ${vm_name}     ${port_ids}  ${security_groups}=${None}  ${userdata}=${None}
+    Log Many    ${vm_name}  ${vm_image}     ${vm_flavor}    ${port_ids}     ${userdata}
+    ${response} =   create server   ${vm_name}     ${vm_image}     ${vm_flavor}    ${port_ids}  ${security_groups}
+    ...                             ${userdata}
     log many    ${response}
     log         ${response.id}
     [Return]    ${response.id}
+
+Check vm console
+    [Arguments]     ${vm_id}    ${string}
+    ${response} =   check server console    ${vm_id}    ${string}
+    [Return]    ${response}
 
 Poll vm
     [Arguments]     ${id}   ${state}
