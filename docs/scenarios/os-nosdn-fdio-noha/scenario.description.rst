@@ -15,11 +15,20 @@ are:
  - Openstack (in non-HA configuration)
  - FD.io/VPP virtual forwarder for tenant networking
 
-Scenario Overview
-==================
+Introduction
+============
 
-Basics
-------
+NFV and virtualized high performance applications, such as video processing,
+require a "fast data stack" solution that provides both carrier grade
+forwarding performance, scalability and open extensibility.
+
+A key component of any NFV solution is the virtual forwarder, which needs to be
+a feature rich, high performance, highly scale virtual switch-router. It needs
+to leverage hardware accelerators when available and run in user space.  In
+addition, it should be modular and easily extensible. The Vector Packet
+Processor (VPP) supplied by the FD.io project meets these needs, in that
+it offers a highly scalable, high performance and easily extensible
+software forwarder that entirely runs in user space.
 
 The "Openstack - FD.io/VPP" scenario provides the capability to realize a set
 of use-cases relevant to the deployment of NFV nodes instantiated by means of
@@ -106,5 +115,17 @@ File "deploy_settings.yaml" choose opendaylight as controller with version
     vpn: false
     vpp: true
 
-Notes and known issues
-======================
+Limitations, Issues and Workarounds
+===================================
+
+There are no known issues.
+
+References
+==========
+
+
+  * FastDataStacks OPNFV project wiki: https://wiki.opnfv.org/display/fds
+  * Fast Data (FD.io): https://fd.io/
+  * FD.io Vector Packet Processor (VPP): https://wiki.fd.io/view/VPP
+  * ML2 VPP mechanisms driver: https://github.com/naveenjoy/networking-vpp/
+  * OPNFV Colorado release - more information: http://www.opnfv.org/colorado
