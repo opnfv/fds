@@ -13,14 +13,42 @@ FastDataStacks OPNFV project. The main components of the
 
  - APEX (TripleO) installer (please also see APEX installer documentation)
  - Openstack (in non-HA configuration)
- - OpenDaylight controller controlling layer 2 networking
+ - OpenDaylight controller (non-clustered) controlling layer 2 networking
  - FD.io/VPP virtual forwarder for tenant networking
 
-Scenario Overview
-==================
+Introduction
+============
 
-Basics
-------
+NFV and virtualized high performance applications, such as video processing,
+require a "fast data stack" solution that provides both carrier grade
+forwarding performance, scalability and open extensibility, along with
+functionality for realizing application policies and controlling a complex
+network topology.
+
+A solution stack is only as good as its foundation. Key foundational assets for
+NFV infrastructure are
+  * The virtual forwarder: The virtual forwarder needs to be a feature rich,
+    high performance, highly scale virtual switch-router. It needs to leverage
+    hardware accelerators when available and run in user space.
+    In addition, it should be modular and easily extensible.
+  * Forwarder diversity: A solution stack should support a variety of
+    forwarders, hardware forwarders (physical switches and routers)
+    as well as software forwarders. This way virtual and physical
+    forwarding domains can be seamlessly glued together.
+  * Policy driven connectivity: Connectivity should respect and
+    reflect different business
+
+In order to meet the desired qualities of an NFV infrastructure, the
+following components were chosen for the "Openstack - OpenDaylight
+ - FD.io/VPP" scenario:
+  * FD.io Vector Packet Processor (VPP) - a highly scalable,
+    high performance, extensible virtual forwarder
+  * OpenDaylight Controller - an extensible controller platform which
+    offers the ability to separate business logic from networking
+    constructs, supports a diverse set of network devices
+    (virtual and physical) via the "group based policy (GBP)"
+    component, and can be clustered to achieve a highly available
+    deployment.
 
 The "Openstack - OpenDaylight - FD.io/VPP" scenario provides the capability to
 realize a set of use-cases relevant to the deployment of NFV nodes instantiated
@@ -46,7 +74,7 @@ servers:
     as a network controller
   * 2 or more Computehosts
 
-.. image:: FDS-ODL_L2-overview.png
+.. image:: FDS-odl_l2-overview.png
 
 Tenant networking leverages FD.io/VPP. Open VSwitch (OVS) is used for all other
 connectivity, in particular the connectivity to public networking / the
@@ -78,8 +106,8 @@ Main features of the "apex-os-odl_l2-fdio-noha" scenario:
     and security groups.
   * Manual and automatic (via DHCP) addressing on tenant networks
 
-Software components of the scenario
----------------------------------------
+Scenario components and composition
+===================================
 
 The apex-os-odl_l2-fdio-noha scenario combines components from three key open
 source projects: OpenStack, OpenDaylight, and Fast Data (FD.io). The key
@@ -220,3 +248,16 @@ File "deploy_settings.yaml" choose opendaylight as controller with version
 
 Notes and known issues
 ======================
+
+There are no known issues.
+
+References
+==========
+
+
+  * FastDataStacks OPNFV project wiki: https://wiki.opnfv.org/display/fds
+  * Fast Data (FD.io): https://fd.io/
+  * FD.io Vector Packet Processor (VPP): https://wiki.fd.io/view/VPP
+  * OpenDaylight Controller: https://www.opendaylight.org/
+  * OPNFV Colorado release - more information: http://www.opnfv.org/colorado
+
