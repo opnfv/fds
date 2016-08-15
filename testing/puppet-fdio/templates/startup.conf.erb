@@ -1,0 +1,22 @@
+unix {
+  cli-listen localhost:5002
+  nodaemon
+  log /tmp/vpp.log
+  full-coredump
+}
+
+dpdk {
+  <% dpdk_pci_devs.each do |n| -%>
+  dev <%=n-%>
+
+  <% end -%>
+  uio-driver <%=@dpdk_pmd_type%>
+}
+
+api-trace {
+  on
+}
+
+api-segment {
+  gid vpp
+}
