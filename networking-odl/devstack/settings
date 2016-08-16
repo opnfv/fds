@@ -1,0 +1,72 @@
+# Devstack settings
+
+# Each service you enable has the following meaning:
+# odl-neutron - Add this config flag if Opendaylight controller and OpenStack
+#               Controller are on different nodes.
+# odl-server  - Add this config flag if Opendaylight controller and OpenStack
+#               Controller are on the same node.
+# odl-compute - Add this config flag for OpenStack Compute.
+#
+# odl-lightweight-testing - Add this config flag for testing neutron ODL ML2
+#                           driver and networking-odl without a real running
+#                           Opendaylight instance
+#
+# NOTE: odl-server includes odl-neutron.
+#
+# An example of enabling all-in-one ODL is below.
+#enable_service odl-compute odl-server
+
+# This can be overridden in the localrc file
+ODL_MODE=${ODL_MODE:-allinone}
+
+# ODL_MODE is used to configure how devstack works with OpenDaylight. You
+# can configure this three ways:
+#
+# ODL_MODE=allinone
+# Use this mode if you want to run ODL in this devstack instance. Useful
+# for a single node deployment or on the control node of a multi-node
+# devstack environment.
+#
+# ODL_MODE=compute
+# Use this for the compute nodes of a multi-node devstack install.
+#
+# ODL_MODE=externalodl
+# This installs the neutron code for ODL, but does not attempt to
+# manage ODL in devstack. This is used for development environments
+# similar to the allinone case except where you are using bleeding edge ODL
+# which is not yet released, and thus don't want it managed by
+# devstack.
+#
+# ODL_MODE=lightweight-testing
+# Use this for testing neutron ML2 driver plus networking-odl without
+# a running Opendaylight instance.
+#
+# ODL_MODE=manual
+# You're on your own here, and are enabling services outside the scope of
+# the ODL_MODE variable.
+
+case $ODL_MODE in
+    allinone)
+        enable_service odl-server odl-compute
+        ;;
+    externalodl)
+        enable_service odl-neutron odl-compute
+        ;;
+    compute)
+        enable_service odl-compute
+        ;;
+    lightweight-testing)
+        enable_service odl-lightweight-testing
+        ;;
+    manual)
+        echo "Manual mode: Enabling services explicitly."
+        ;;
+esac
+
+
+IS_GATE=$(trueorfalse False IS_GATE)
+if [[ "$IS_GATE" == "True" ]]
+then
+    NETWORKING_ODL_DIR=$DEST/networking-odl
+    source $NETWORKING_ODL_DIR/devstack/devstackgaterc
+fi
