@@ -19,7 +19,6 @@ Create Date: 2015-09-03 22:27:49.306394
 
 """
 
-from neutron.db import migration
 from neutron.db.migration import cli
 
 
@@ -27,9 +26,6 @@ from neutron.db.migration import cli
 revision = '383acb0d38a0'
 down_revision = 'b89a299e19f9'
 branch_labels = (cli.CONTRACT_BRANCH,)
-
-# milestone identifier, used by neutron-db-manage
-neutron_milestone = [migration.MITAKA]
 
 
 def upgrade():

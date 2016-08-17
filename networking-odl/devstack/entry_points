@@ -54,9 +54,8 @@ function configure_opendaylight {
         fi
     fi
 
-    # Configure L3 if the user wants it for NETVIRT_OVSDB
-    # L3 is always enabled in NETVIRT_VPNSERVICE
-    if [[ ",$ODL_NETVIRT_KARAF_FEATURE," =~ ",$ODL_NETVIRT_KARAF_FEATURE_OVSDB," ]] && [ "${ODL_L3}" == "True" ]; then
+    # Configure L3 if the user wants it
+    if [ "${ODL_L3}" == "True" ]; then
         # Configure L3 FWD if it's not there
         local L3FWD=$(cat $ODL_DIR/$ODL_NAME/etc/custom.properties | \
                       grep ^ovsdb.l3.fwd.enabled)
@@ -129,10 +128,6 @@ function configure_neutron_odl {
     populate_ml2_config /$Q_PLUGIN_CONF_FILE ml2_odl username=$ODL_USERNAME
     populate_ml2_config /$Q_PLUGIN_CONF_FILE ml2_odl password=$ODL_PASSWORD
     populate_ml2_config /$Q_PLUGIN_CONF_FILE ml2_odl port_binding_controller=$ODL_PORT_BINDING_CONTROLLER
-    # When it's not set, the default value is set by networking-odl
-    if [[ -n "$ODL_HOSTCONF_URI" ]]; then
-        populate_ml2_config /$Q_PLUGIN_CONF_FILE ml2_odl odl_hostconf_uri=$ODL_HOSTCONF_URI
-    fi
 }
 
 function configure_neutron_odl_lightweight_testing {
@@ -254,6 +249,7 @@ function cleanup_opendaylight_compute {
     done
 }
 
+
 # bind_opendaylight_controller() - set control manager to OVS
 function bind_opendaylight_controller {
     echo_summary "Initializing OpenDaylight"
@@ -263,19 +259,16 @@ function bind_opendaylight_controller {
     read ovstbl <<< $(sudo ovs-vsctl get Open_vSwitch . _uuid)
     local ODL_MANAGERS_PARAM=()
     for manager in $(echo $ODL_OVS_MANAGERS | tr "," "\n"); do
-        # ovsdbd doesn't understand localhost. replace it to numerical ip address
-        ODL_MANAGERS_PARAM=( "${ODL_MANAGERS_PARAM[@]}" "tcp:${manager/localhost/127.0.0.1}:$ODL_MGR_PORT" )
+        ODL_MANAGERS_PARAM=( "${ODL_MANAGERS_PARAM[@]}" "tcp:$manager:$ODL_MGR_PORT" )
     done
-    # don't overwrite the already existing managers
-    local ODL_MANAGERS_OLD=$(sudo ovs-vsctl get-manager)
-    local ODL_MANAGERS=$(echo $ODL_MANAGERS_OLD ${ODL_MANAGERS_PARAM[@]} | tr ' ' '\n' | sort | uniq | tr '\n' ' ')
-    sudo ovs-vsctl set-manager ${ODL_MANAGERS}
+    sudo ovs-vsctl set-manager ${ODL_MANAGERS_PARAM[@]}
     if [[ -n "$ODL_PROVIDER_MAPPINGS" ]]; then
         sudo ovs-vsctl set Open_vSwitch $ovstbl \
             other_config:provider_mappings=$ODL_PROVIDER_MAPPINGS
     fi
     sudo ovs-vsctl set Open_vSwitch $ovstbl other_config:local_ip=$ODL_LOCAL_IP
 }
+
 
 # unbind_opendaylight_controller() - disconnect controller from switch and clear bridges
 function unbind_opendaylight_controller {

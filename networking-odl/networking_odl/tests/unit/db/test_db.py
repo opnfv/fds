@@ -41,7 +41,6 @@ class DbTestCase(SqlTestCaseLight, TestCase):
 
     def _db_cleanup(self):
         self.db_session.query(models.OpendaylightJournal).delete()
-        self.db_session.query(models.OpendaylightMaintenance).delete()
 
     def _update_row(self, row):
         self.db_session.merge(row)
@@ -162,33 +161,6 @@ class DbTestCase(SqlTestCaseLight, TestCase):
 
         self.assertEqual(2, update_mock.call_count)
 
-    def _test_delete_rows_by_state_and_time(self, last_retried, row_retention,
-                                            state, expected_rows):
-        db.create_pending_row(self.db_session, *self.UPDATE_ROW)
-
-        # update state and last retried
-        row = db.get_all_db_rows(self.db_session)[0]
-        row.state = state
-        row.last_retried = row.last_retried - timedelta(seconds=last_retried)
-        self._update_row(row)
-
-        db.delete_rows_by_state_and_time(self.db_session,
-                                         odl_const.COMPLETED,
-                                         timedelta(seconds=row_retention))
-
-        # validate the number of rows in the journal
-        rows = db.get_all_db_rows(self.db_session)
-        self.assertEqual(expected_rows, len(rows))
-
-    def test_delete_completed_rows_no_new_rows(self):
-        self._test_delete_rows_by_state_and_time(0, 10, odl_const.COMPLETED, 1)
-
-    def test_delete_completed_rows_one_new_row(self):
-        self._test_delete_rows_by_state_and_time(6, 5, odl_const.COMPLETED, 0)
-
-    def test_delete_completed_rows_wrong_state(self):
-        self._test_delete_rows_by_state_and_time(10, 8, odl_const.PENDING, 1)
-
     def test_valid_retry_count(self):
         self._test_retry_count(1, 1, 1, odl_const.PENDING)
 
@@ -206,38 +178,3 @@ class DbTestCase(SqlTestCaseLight, TestCase):
 
     def test_update_row_state_to_completed(self):
         self._test_update_row_state(odl_const.PROCESSING, odl_const.COMPLETED)
-
-    def _test_maintenance_lock_unlock(self, db_func, existing_state,
-                                      expected_state, expected_result):
-        row = models.OpendaylightMaintenance(id='test',
-                                             state=existing_state)
-        self.db_session.add(row)
-        self.db_session.flush()
-
-        self.assertEqual(expected_result, db_func(self.db_session))
-        row = self.db_session.query(models.OpendaylightMaintenance).one()
-        self.assertEqual(expected_state, row['state'])
-
-    def test_lock_maintenance(self):
-        self._test_maintenance_lock_unlock(db.lock_maintenance,
-                                           odl_const.PENDING,
-                                           odl_const.PROCESSING,
-                                           True)
-
-    def test_lock_maintenance_fails_when_processing(self):
-        self._test_maintenance_lock_unlock(db.lock_maintenance,
-                                           odl_const.PROCESSING,
-                                           odl_const.PROCESSING,
-                                           False)
-
-    def test_unlock_maintenance(self):
-        self._test_maintenance_lock_unlock(db.unlock_maintenance,
-                                           odl_const.PROCESSING,
-                                           odl_const.PENDING,
-                                           True)
-
-    def test_unlock_maintenance_fails_when_pending(self):
-        self._test_maintenance_lock_unlock(db.unlock_maintenance,
-                                           odl_const.PENDING,
-                                           odl_const.PENDING,
-                                           False)

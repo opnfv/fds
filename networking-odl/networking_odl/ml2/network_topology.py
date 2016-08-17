@@ -27,7 +27,7 @@ from oslo_serialization import jsonutils
 from networking_odl.common import cache
 from networking_odl.common import client
 from networking_odl.common import utils
-from networking_odl._i18n import _, _LI, _LW, _LE
+from networking_odl._i18n import _LI, _LW, _LE
 from networking_odl.ml2 import port_binding
 
 
@@ -44,7 +44,8 @@ class NetworkTopologyManager(port_binding.PortBindingController):
     # List of class names of registered implementations of interface
     # NetworkTopologyParser
     network_topology_parsers = [
-        'networking_odl.ml2.ovsdb_topology.OvsdbNetworkTopologyParser']
+        'networking_odl.ml2.ovsdb_topology.OvsdbNetworkTopologyParser',
+        'networking_odl.ml2.vpp_topology.VppNetworkTopologyParser']
 
     def __init__(self, vif_details=None, client=None):
         # Details for binding port
@@ -65,6 +66,7 @@ class NetworkTopologyManager(port_binding.PortBindingController):
 
         """
         host_name = port_context.host
+        LOG.debug('Processing port for host: %s', host_name)
         elements = list()
         try:
             # Append to empty list to add as much elements as possible
@@ -85,6 +87,7 @@ class NetworkTopologyManager(port_binding.PortBindingController):
                 {'host_name': host_name})
 
             # Imported here to avoid cyclic module dependencies
+            # TODO(wdec): Add vpp topology import
             from networking_odl.ml2 import ovsdb_topology
             elements = [ovsdb_topology.OvsdbNetworkTopologyElement()]
 
@@ -100,7 +103,8 @@ class NetworkTopologyManager(port_binding.PortBindingController):
                     # it is invalid for at least one element: discard it
                     vif_type_is_valid_for_all = False
                     break
-
+        # TODO(wdec): This needs to deal with not all network elements
+        # supporting all binding types.
             if vif_type_is_valid_for_all:
                 # This is the best VIF type valid for all elements
                 LOG.debug(
@@ -206,13 +210,14 @@ class NetworkTopologyManager(port_binding.PortBindingController):
             try:
                 for element in parser.parse_network_topology(network_topology):
                     if not isinstance(element, NetworkTopologyElement):
-                        raise TypeError(_(
+                        raise TypeError(
                             "Yield element doesn't implement interface "
-                            "'NetworkTopologyElement': {!r}").format(element))
+                            "'NetworkTopologyElement': {!r}".format(element))
                     # the same element can be known by more host addresses
                     for host_address in element.host_addresses:
                         if host_address in addresses:
                             at_least_one_element_for_asked_addresses = True
+                            LOG.debug("Found cached Host: %s \n", host_address)
                         yield host_address, element
             except Exception:
                 LOG.exception(
@@ -224,8 +229,8 @@ class NetworkTopologyManager(port_binding.PortBindingController):
             # calling this method again as soon it is requested and avoid
             # waiting for cache expiration
             raise ValueError(
-                _('No such topology element for given host addresses: {}')
-                .format(', '.join(addresses)))
+                'No such topology element for given host addresses: {}'.format(
+                    ', '.join(addresses)))
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -240,9 +245,9 @@ class NetworkTopologyParser(object):
         module = importlib.import_module(module_name)
         clss = getattr(module, class_name)
         if not issubclass(clss, cls):
-            raise TypeError(_(
+            raise TypeError(
                 "Class {class_name!r} of module {module_name!r} doesn't "
-                "implement 'NetworkTopologyParser' interface.").format(
+                "implement 'NetworkTopologyParser' interface.".format(
                     class_name=class_name, module_name=module_name))
         return clss()
 

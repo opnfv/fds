@@ -78,7 +78,10 @@ class DataMatcher(object):
     def __init__(self, operation, object_type, object_dict):
         self._data = object_dict.copy()
         self._object_type = object_type
-        filters.filter_for_odl(object_type, operation, self._data)
+        filter_cls = filters.FILTER_MAP[object_type]
+        attr_filter = getattr(filter_cls,
+                              'filter_' + operation + '_attributes')
+        attr_filter(self._data)
 
     def __eq__(self, s):
         data = jsonutils.loads(s)
@@ -86,9 +89,6 @@ class DataMatcher(object):
             return self._data == data
         else:
             return self._data == data[self._object_type]
-
-    def __ne__(self, s):
-        return not self.__eq__(s)
 
 
 class OpenDaylightL3TestCase(test_db_base_plugin_v2.NeutronDbPluginV2TestCase,

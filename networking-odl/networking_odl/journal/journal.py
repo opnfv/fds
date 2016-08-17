@@ -21,9 +21,7 @@ from requests import exceptions
 from oslo_config import cfg
 from oslo_log import log as logging
 
-from neutron import context as neutron_context
 from neutron.db import api as neutron_db_api
-from neutron import manager
 
 from networking_odl.common import client
 from networking_odl.common import constants as odl_const
@@ -42,51 +40,6 @@ def call_thread_on_end(func):
         obj.journal.set_sync_event()
         return return_value
     return new_func
-
-
-def _enrich_port(db_session, context, object_type, operation, data):
-    """Enrich the port with additional information needed by ODL"""
-    if context:
-        plugin = context._plugin
-        dbcontext = context._plugin_context
-    else:
-        dbcontext = neutron_context.get_admin_context()
-        plugin = manager.NeutronManager.get_plugin()
-
-    groups = [plugin.get_security_group(dbcontext, sg)
-              for sg in data['security_groups']]
-    new_data = copy.deepcopy(data)
-    new_data['security_groups'] = groups
-
-    # NOTE(yamahata): work around for port creation for router
-    # tenant_id=''(empty string) is passed when port is created
-    # by l3 plugin internally for router.
-    # On the other hand, ODL doesn't accept empty string for tenant_id.
-    # In that case, deduce tenant_id from network_id for now.
-    # Right fix: modify Neutron so that don't allow empty string
-    # for tenant_id even for port for internal use.
-    # TODO(yamahata): eliminate this work around when neutron side
-    # is fixed
-    # assert port['tenant_id'] != ''
-    if ('tenant_id' not in new_data or new_data['tenant_id'] == ''):
-        if context:
-            tenant_id = context._network_context._network['tenant_id']
-        else:
-            network = plugin.get_network(dbcontext, new_data['network_id'])
-            tenant_id = network['tenant_id']
-        new_data['tenant_id'] = tenant_id
-
-    return new_data
-
-
-def record(db_session, object_type, object_uuid, operation, data,
-           context=None):
-    if (object_type == odl_const.ODL_PORT and
-            operation in (odl_const.ODL_CREATE, odl_const.ODL_UPDATE)):
-        data = _enrich_port(db_session, context, object_type, operation, data)
-
-    db.create_pending_row(db_session, object_type, object_uuid, operation,
-                          data)
 
 
 class OpendaylightJournalThread(object):
@@ -123,28 +76,40 @@ class OpendaylightJournalThread(object):
         self._timer.start()
 
     def _json_data(self, row):
-        data = copy.deepcopy(row.data)
-        filters.filter_for_odl(row.object_type, row.operation, data)
+        filter_cls = filters.FILTER_MAP[row.object_type]
         url_object = row.object_type.replace('_', '-')
 
         if row.operation == odl_const.ODL_CREATE:
             method = 'post'
+            attr_filter = filter_cls.filter_create_attributes
+            data = copy.deepcopy(row.data)
             urlpath = url_object + 's'
+            attr_filter(data)
             to_send = {row.object_type: data}
         elif row.operation == odl_const.ODL_UPDATE:
             method = 'put'
+            attr_filter = filter_cls.filter_update_attributes
+            data = copy.deepcopy(row.data)
             urlpath = url_object + 's/' + row.object_uuid
+            attr_filter(data)
             to_send = {row.object_type: data}
         elif row.operation == odl_const.ODL_DELETE:
             method = 'delete'
+            data = None
             urlpath = url_object + 's/' + row.object_uuid
             to_send = None
         elif row.operation == odl_const.ODL_ADD:
             method = 'put'
+            attr_filter = filter_cls.filter_add_attributes
+            data = copy.deepcopy(row.data)
+            attr_filter(data)
             urlpath = 'routers/' + data['id'] + '/add_router_interface'
             to_send = data
         elif row.operation == odl_const.ODL_REMOVE:
             method = 'put'
+            attr_filter = filter_cls.filter_remove_attributes
+            data = copy.deepcopy(row.data)
+            attr_filter(data)
             urlpath = 'routers/' + data['id'] + '/remove_router_interface'
             to_send = data
 
@@ -177,7 +142,9 @@ class OpendaylightJournalThread(object):
                 break
 
             # Validate the operation
-            valid = dependency_validations.validate(session, row)
+            validate_func = (dependency_validations.
+                             VALIDATION_MAP[row.object_type])
+            valid = validate_func(session, row)
             if not valid:
                 LOG.info(_LI("%(operation)s %(type)s %(uuid)s is not a "
                              "valid operation yet, skipping for now"),

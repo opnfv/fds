@@ -16,10 +16,10 @@
 
 from oslo_log import log
 
+from neutron.common import constants as n_const
 from neutron.extensions import portbindings
 from neutron.plugins.common import constants
 from neutron.plugins.ml2 import driver_api
-from neutron_lib import constants as n_const
 
 from networking_odl.ml2 import port_binding
 
@@ -31,18 +31,11 @@ class LegacyPortBindingManager(port_binding.PortBindingController):
 
     def __init__(self):
         self.vif_details = {portbindings.CAP_PORT_FILTER: True}
-        self.supported_vnic_types = [portbindings.VNIC_NORMAL]
 
     def bind_port(self, port_context):
         """Set binding for all valid segments
 
         """
-        vnic_type = port_context.current.get(portbindings.VNIC_TYPE,
-                                             portbindings.VNIC_NORMAL)
-        if vnic_type not in self.supported_vnic_types:
-            LOG.debug("Refusing to bind due to unsupported vnic_type: %s",
-                      vnic_type)
-            return
 
         valid_segment = None
         for segment in port_context.segments_to_bind:

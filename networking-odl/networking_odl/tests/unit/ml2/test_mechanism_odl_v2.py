@@ -12,14 +12,12 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import datetime
+from datetime import timedelta
 
-from networking_odl.common import callback
 from networking_odl.common import client
 from networking_odl.common import constants as odl_const
 from networking_odl.common import filters
 from networking_odl.db import db
-from networking_odl.journal import cleanup
 from networking_odl.journal import journal
 from networking_odl.ml2 import mech_driver_v2
 
@@ -29,7 +27,6 @@ from oslo_serialization import jsonutils
 import requests
 
 from neutron.db import api as neutron_db_api
-from neutron import manager
 from neutron.plugins.ml2 import config as config
 from neutron.plugins.ml2 import plugin
 from neutron.tests.unit.plugins.ml2 import test_plugin
@@ -37,6 +34,8 @@ from neutron.tests.unit import testlib_api
 
 cfg.CONF.import_group('ml2_odl', 'networking_odl.common.config')
 
+HOST = 'fake-host'
+PLUGIN_NAME = 'neutron.plugins.ml2.plugin.Ml2Plugin'
 SECURITY_GROUP = '2f9244b4-9bee-4e81-bc4a-3f3c2045b3d7'
 SG_FAKE_ID = 'sg_fake_uuid'
 SG_RULE_FAKE_ID = 'sg_rule_fake_uuid'
@@ -124,20 +123,13 @@ class DataMatcher(object):
         else:
             self._data = context.current.copy()
         self._object_type = object_type
-        filters.filter_for_odl(object_type, operation, self._data)
+        filter_cls = filters.FILTER_MAP[object_type]
+        attr_filter = getattr(filter_cls, 'filter_%s_attributes' % operation)
+        attr_filter(self._data)
 
     def __eq__(self, s):
         data = jsonutils.loads(s)
         return self._data == data[self._object_type]
-
-    def __ne__(self, s):
-        return not self.__eq__(s)
-
-
-class AttributeDict(dict):
-    def __init__(self, *args, **kwargs):
-        super(AttributeDict, self).__init__(*args, **kwargs)
-        self.__dict__ = self
 
 
 class OpenDaylightMechanismDriverTestCase(OpenDaylightConfigBase):
@@ -209,19 +201,15 @@ class OpenDaylightMechanismDriverTestCase(OpenDaylightConfigBase):
                    'binding:vnic_type': 'normal',
                    'binding:vif_type': 'unbound',
                    'mac_address': '12:34:56:78:21:b6'}
-        _network = OpenDaylightMechanismDriverTestCase.\
-            _get_mock_network_operation_context().current
-        _plugin = manager.NeutronManager.get_plugin()
-        _plugin.get_security_group = mock.Mock(return_value=SECURITY_GROUP)
-        _plugin.get_port = mock.Mock(return_value=current)
-        _plugin.get_network = mock.Mock(return_value=_network)
-        _plugin_context_mock = {'session': neutron_db_api.get_session()}
-        _network_context_mock = {'_network': _network}
-        context = {'current': AttributeDict(current),
-                   '_plugin': _plugin,
-                   '_plugin_context': AttributeDict(_plugin_context_mock),
-                   '_network_context': AttributeDict(_network_context_mock)}
-        return AttributeDict(context)
+        context = mock.Mock(current=current)
+        context._plugin.get_security_group = mock.Mock(
+            return_value=SECURITY_GROUP)
+        context._plugin.get_port = mock.Mock(return_value=current)
+        context._plugin_context.session = neutron_db_api.get_session()
+        context._network_context = mock.Mock(
+            _network=OpenDaylightMechanismDriverTestCase.
+            _get_mock_network_operation_context().current)
+        return context
 
     @staticmethod
     def _get_mock_security_group_operation_context():
@@ -285,9 +273,7 @@ class OpenDaylightMechanismDriverTestCase(OpenDaylightConfigBase):
         context = self._get_mock_operation_context(object_type)
 
         if object_type in [odl_const.ODL_SG, odl_const.ODL_SG_RULE]:
-            res_type = [rt for rt in callback._RESOURCE_MAPPING.values()
-                        if rt.singular == object_type][0]
-            self.mech.sync_from_callback(operation, res_type,
+            self.mech.sync_from_callback(operation, object_type + 's',
                                          context[object_type]['id'], context)
         else:
             method = getattr(self.mech, '%s_%s_precommit' % (operation,
@@ -413,46 +399,12 @@ class OpenDaylightMechanismDriverTestCase(OpenDaylightConfigBase):
         self._test_object_operation_pending_another_object_operation(
             parent, odl_const.ODL_DELETE, child, odl_const.ODL_DELETE)
 
-    def _test_cleanup_processing_rows(self, last_retried, expected_state):
-        # Create a dummy network (creates db row in pending state).
-        self._call_operation_object(odl_const.ODL_CREATE,
-                                    odl_const.ODL_NETWORK)
-
-        # Get pending row and mark as processing and update
-        # the last_retried time
-        row = db.get_all_db_rows_by_state(self.db_session,
-                                          odl_const.PENDING)[0]
-        row.last_retried = last_retried
-        db.update_db_row_state(self.db_session, row, odl_const.PROCESSING)
-
-        # Test if the cleanup marks this in the desired state
-        # based on the last_retried timestamp
-        cleanup.JournalCleanup().cleanup_processing_rows(self.db_session)
-
-        # Verify that the Db row is in the desired state
-        rows = db.get_all_db_rows_by_state(self.db_session, expected_state)
-        self.assertEqual(1, len(rows))
-
     def test_driver(self):
         for operation in [odl_const.ODL_CREATE, odl_const.ODL_UPDATE,
                           odl_const.ODL_DELETE]:
             for object_type in [odl_const.ODL_NETWORK, odl_const.ODL_SUBNET,
                                 odl_const.ODL_PORT]:
                 self._test_operation_object(operation, object_type)
-
-    def test_port_precommit_no_tenant(self):
-        context = self._get_mock_operation_context(odl_const.ODL_PORT)
-        context.current['tenant_id'] = ''
-
-        method = getattr(self.mech, 'create_port_precommit')
-        method(context)
-
-        # Verify that the Db row has a tenant
-        rows = db.get_all_db_rows_by_state(self.db_session, odl_const.PENDING)
-        self.assertEqual(1, len(rows))
-        _network = OpenDaylightMechanismDriverTestCase.\
-            _get_mock_network_operation_context().current
-        self.assertEqual(_network['tenant_id'], rows[0]['data']['tenant_id'])
 
     def test_network(self):
         self._test_object_type(odl_const.ODL_NETWORK)
@@ -523,14 +475,6 @@ class OpenDaylightMechanismDriverTestCase(OpenDaylightConfigBase):
     def test_port_processing_network(self):
         self._test_object_type_processing_network(odl_const.ODL_PORT)
 
-    def test_cleanup_processing_rows_time_not_expired(self):
-        self._test_cleanup_processing_rows(datetime.datetime.utcnow(),
-                                           odl_const.PROCESSING)
-
-    def test_cleanup_processing_rows_time_expired(self):
-        old_time = datetime.datetime.utcnow() - datetime.timedelta(hours=24)
-        self._test_cleanup_processing_rows(old_time, odl_const.PENDING)
-
     def test_thread_call(self):
         """Verify that the sync thread method is called."""
 
@@ -549,7 +493,7 @@ class OpenDaylightMechanismDriverTestCase(OpenDaylightConfigBase):
         self._test_object_type(odl_const.ODL_SG_RULE)
 
     def _decrease_row_created_time(self, row):
-        row.created_at -= datetime.timedelta(hours=1)
+        row.created_at -= timedelta(hours=1)
         self.db_session.merge(row)
         self.db_session.flush()
 

@@ -34,34 +34,12 @@ odl_opts = [
     cfg.IntOpt('retry_count', default=5,
                help=_("(V2 driver) Number of times to retry a row "
                       "before failing.")),
-    cfg.IntOpt('maintenance_interval', default=300,
-               help=_("(V2 driver) Journal maintenance operations interval "
-                      "in seconds.")),
-    cfg.IntOpt('completed_rows_retention', default=600,
-               help=_("(V2 driver) Time to keep completed rows in seconds."
-                      "Completed rows retention will be checked every "
-                      "maintenance_interval by the cleanup thread."
-                      "To disable completed rows deletion "
-                      "value should be -1")),
     cfg.BoolOpt('enable_lightweight_testing',
                 default=False,
                 help=_('Test without real ODL.')),
     cfg.StrOpt('port_binding_controller',
                default='network-topology',
-               help=_('Name of the controller to be used for port binding.')),
-    cfg.IntOpt('processing_timeout', default='100',
-               help=_("(V2 driver) Time in seconds to wait before a "
-                      "processing row is marked back to pending.")),
-    cfg.StrOpt('odl_hostconf_uri',
-               help=_("Path for ODL host configuration REST interface"),
-               default="/restconf/operational/neutron:neutron/hostconfigs"),
-    cfg.IntOpt('restconf_poll_interval', default=30,
-               help=_("Poll interval in seconds for getting ODL hostconfig")),
-
+               help=_('Name of the controller to be used for port binding.'))
 ]
 
 cfg.CONF.register_opts(odl_opts, "ml2_odl")
-
-
-def list_opts():
-    return [('ml2_odl', odl_opts)]

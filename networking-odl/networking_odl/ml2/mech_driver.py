@@ -23,13 +23,13 @@ from oslo_log import log as logging
 from oslo_utils import excutils
 import requests
 
+from neutron.common import exceptions as n_exc
 from neutron.common import utils
 from neutron import context as neutron_context
 from neutron.extensions import allowedaddresspairs as addr_pair
 from neutron.extensions import securitygroup as sg
 from neutron.plugins.ml2 import driver_api
 from neutron.plugins.ml2 import driver_context
-from neutron_lib import exceptions as n_exc
 
 from networking_odl._i18n import _LE
 from networking_odl.common import callback as odl_call
@@ -67,46 +67,17 @@ class ResourceFilterBase(object):
     def filter_create_attributes_with_plugin(resource, plugin, dbcontext):
         pass
 
-    @staticmethod
-    def _filter_unmapped_null(resource_dict, unmapped_keys):
-        # NOTE(yamahata): bug work around
-        # https://bugs.eclipse.org/bugs/show_bug.cgi?id=475475
-        #   Null-value for an unmapped element causes next mapped
-        #   collection to contain a null value
-        #   JSON: { "unmappedField": null, "mappedCollection": [ "a" ] }
-        #
-        #   Java Object:
-        #   class Root {
-        #     Collection<String> mappedCollection = new ArrayList<String>;
-        #   }
-        #
-        #   Result:
-        #   Field B contains one element; null
-        #
-        # TODO(yamahata): update along side with neutron and ODL
-        #   add when neutron adds more extensions
-        #   delete when ODL neutron northbound supports it
-        # TODO(yamahata): do same thing for other resources
-        keys_to_del = [key for key in unmapped_keys
-                       if resource_dict.get(key) is None]
-        if keys_to_del:
-            odl_utils.try_del(resource_dict, keys_to_del)
-
 
 class NetworkFilter(ResourceFilterBase):
-    _UNMAPPED_KEYS = ['qos_policy_id']
-
-    @classmethod
-    def filter_create_attributes(cls, network, context):
+    @staticmethod
+    def filter_create_attributes(network, context):
         """Filter out network attributes not required for a create."""
         odl_utils.try_del(network, ['status', 'subnets'])
-        cls._filter_unmapped_null(network, cls._UNMAPPED_KEYS)
 
-    @classmethod
-    def filter_update_attributes(cls, network, context):
+    @staticmethod
+    def filter_update_attributes(network, context):
         """Filter out network attributes for an update operation."""
         odl_utils.try_del(network, ['id', 'status', 'subnets', 'tenant_id'])
-        cls._filter_unmapped_null(network, cls._UNMAPPED_KEYS)
 
     @classmethod
     def filter_create_attributes_with_plugin(cls, network, plugin, dbcontext):
@@ -135,9 +106,6 @@ class SubnetFilter(ResourceFilterBase):
 
 
 class PortFilter(ResourceFilterBase):
-    _UNMAPPED_KEYS = ['binding:profile', 'dns_name',
-                      'port_security_enabled', 'qos_policy_id']
-
     @staticmethod
     def _add_security_groups(port, context):
         """Populate the 'security_groups' field with entire records."""
@@ -154,12 +122,38 @@ class PortFilter(ResourceFilterBase):
             network_address = str(netaddr.IPNetwork(ip_address))
             address_pair['ip_address'] = network_address
 
+    @staticmethod
+    def _filter_unmapped_null(port):
+        # NOTE(yamahata): bug work around
+        # https://bugs.eclipse.org/bugs/show_bug.cgi?id=475475
+        #   Null-value for an unmapped element causes next mapped
+        #   collection to contain a null value
+        #   JSON: { "unmappedField": null, "mappedCollection": [ "a" ] }
+        #
+        #   Java Object:
+        #   class Root {
+        #     Collection<String> mappedCollection = new ArrayList<String>;
+        #   }
+        #
+        #   Result:
+        #   Field B contains one element; null
+        #
+        # TODO(yamahata): update along side with neutron and ODL
+        #   add when neutron adds more extensions
+        #   delete when ODL neutron northbound supports it
+        # TODO(yamahata): do same thing for other resources
+        unmapped_keys = ['dns_name', 'port_security_enabled',
+                         'binding:profile']
+        keys_to_del = [key for key in unmapped_keys if port.get(key) is None]
+        if keys_to_del:
+            odl_utils.try_del(port, keys_to_del)
+
     @classmethod
     def filter_create_attributes(cls, port, context):
         """Filter out port attributes not required for a create."""
         cls._add_security_groups(port, context)
         cls._fixup_allowed_ipaddress_pairs(port[addr_pair.ADDRESS_PAIRS])
-        cls._filter_unmapped_null(port, cls._UNMAPPED_KEYS)
+        cls._filter_unmapped_null(port)
         odl_utils.try_del(port, ['status'])
 
         # NOTE(yamahata): work around for port creation for router
@@ -181,7 +175,7 @@ class PortFilter(ResourceFilterBase):
         """Filter out port attributes for an update operation."""
         cls._add_security_groups(port, context)
         cls._fixup_allowed_ipaddress_pairs(port[addr_pair.ADDRESS_PAIRS])
-        cls._filter_unmapped_null(port, cls._UNMAPPED_KEYS)
+        cls._filter_unmapped_null(port)
         odl_utils.try_del(port, ['network_id', 'id', 'status', 'tenant_id'])
 
     @classmethod
@@ -363,8 +357,8 @@ class OpenDaylightDriver(object):
                            'object_id': obj_id})
                 self.out_of_sync = True
 
-    def sync_from_callback(self, operation, res_type, res_id, resource_dict):
-        object_type = res_type.plural.replace('_', '-')
+    def sync_from_callback(self, operation, object_type, res_id,
+                           resource_dict):
         try:
             if operation == odl_const.ODL_DELETE:
                 self.out_of_sync |= not self.client.try_delete(
@@ -380,8 +374,7 @@ class OpenDaylightDriver(object):
         except Exception:
             with excutils.save_and_reraise_exception():
                 LOG.error(_LE("Unable to perform %(operation)s on "
-                              "%(object_type)s %(res_id)s "
-                              "%(resource_dict)s"),
+                              "%(object_type)s %(res_id)s %(resource_dict)s"),
                           {'operation': operation,
                            'object_type': object_type,
                            'res_id': res_id,
@@ -419,40 +412,31 @@ class OpenDaylightMechanismDriver(driver_api.MechanismDriver):
     # Postcommit hooks are used to trigger synchronization.
 
     def create_network_postcommit(self, context):
-        self.odl_drv.synchronize(odl_const.ODL_CREATE, odl_const.ODL_NETWORKS,
-                                 context)
+        self.odl_drv.synchronize('create', odl_const.ODL_NETWORKS, context)
 
     def update_network_postcommit(self, context):
-        self.odl_drv.synchronize(odl_const.ODL_UPDATE, odl_const.ODL_NETWORKS,
-                                 context)
+        self.odl_drv.synchronize('update', odl_const.ODL_NETWORKS, context)
 
     def delete_network_postcommit(self, context):
-        self.odl_drv.synchronize(odl_const.ODL_DELETE, odl_const.ODL_NETWORKS,
-                                 context)
+        self.odl_drv.synchronize('delete', odl_const.ODL_NETWORKS, context)
 
     def create_subnet_postcommit(self, context):
-        self.odl_drv.synchronize(odl_const.ODL_CREATE, odl_const.ODL_SUBNETS,
-                                 context)
+        self.odl_drv.synchronize('create', odl_const.ODL_SUBNETS, context)
 
     def update_subnet_postcommit(self, context):
-        self.odl_drv.synchronize(odl_const.ODL_UPDATE, odl_const.ODL_SUBNETS,
-                                 context)
+        self.odl_drv.synchronize('update', odl_const.ODL_SUBNETS, context)
 
     def delete_subnet_postcommit(self, context):
-        self.odl_drv.synchronize(odl_const.ODL_DELETE, odl_const.ODL_SUBNETS,
-                                 context)
+        self.odl_drv.synchronize('delete', odl_const.ODL_SUBNETS, context)
 
     def create_port_postcommit(self, context):
-        self.odl_drv.synchronize(odl_const.ODL_CREATE, odl_const.ODL_PORTS,
-                                 context)
+        self.odl_drv.synchronize('create', odl_const.ODL_PORTS, context)
 
     def update_port_postcommit(self, context):
-        self.odl_drv.synchronize(odl_const.ODL_UPDATE, odl_const.ODL_PORTS,
-                                 context)
+        self.odl_drv.synchronize('update', odl_const.ODL_PORTS, context)
 
     def delete_port_postcommit(self, context):
-        self.odl_drv.synchronize(odl_const.ODL_DELETE, odl_const.ODL_PORTS,
-                                 context)
+        self.odl_drv.synchronize('delete', odl_const.ODL_PORTS, context)
 
     def bind_port(self, context):
         self.odl_drv.bind_port(context)

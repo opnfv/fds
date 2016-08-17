@@ -20,16 +20,9 @@ Revises: 247501328046
 Create Date: 2015-10-30 22:09:27.221767
 
 """
-from neutron.db import migration
-
-
 # revision identifiers, used by Alembic.
 revision = '37e242787ae5'
 down_revision = '247501328046'
-
-# milestone identifier, used by neutron-db-manage
-neutron_milestone = [migration.MITAKA]
-
 
 from alembic import op
 import sqlalchemy as sa
@@ -44,8 +37,7 @@ def upgrade():
         sa.Column('operation', sa.String(36), nullable=False),
         sa.Column('data', sa.PickleType, nullable=True),
         sa.Column('state',
-                  sa.Enum('pending', 'processing', 'failed', 'completed',
-                          name='state'),
+                  sa.Enum('pending', 'processing', 'failed', 'completed'),
                   nullable=False, default='pending'),
         sa.Column('retry_count', sa.Integer, default=0),
         sa.Column('created_at', sa.DateTime, default=sa.func.now()),

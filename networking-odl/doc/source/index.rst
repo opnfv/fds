@@ -15,16 +15,7 @@ Contents:
    installation
    usage
    contributing
-   specs
-
-Developer Docs
-==============
-
-.. toctree::
-   :maxdepth: 1
-
-   devref/index
-
+   features
 
 Indices and tables
 ==================

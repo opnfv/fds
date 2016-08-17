@@ -12,8 +12,6 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import datetime
-
 from sqlalchemy import asc
 from sqlalchemy import func
 from sqlalchemy import or_
@@ -163,72 +161,3 @@ def create_pending_row(session, object_type, object_uuid,
     # Keep session flush for unit tests. NOOP for L2/L3 events since calls are
     # made inside database session transaction with subtransactions=True.
     session.flush()
-
-
-@db_api.retry_db_errors
-def delete_pending_rows(session, operations_to_delete):
-    with session.begin():
-        session.query(models.OpendaylightJournal).filter(
-            models.OpendaylightJournal.operation.in_(operations_to_delete),
-            models.OpendaylightJournal.state == odl_const.PENDING).delete(
-            synchronize_session=False)
-        session.expire_all()
-
-
-@db_api.retry_db_errors
-def _update_maintenance_state(session, expected_state, state):
-    with session.begin():
-        row = session.query(models.OpendaylightMaintenance).filter_by(
-            state=expected_state).with_for_update().one_or_none()
-        if row is None:
-            return False
-
-        row.state = state
-        return True
-
-
-def lock_maintenance(session):
-    return _update_maintenance_state(session, odl_const.PENDING,
-                                     odl_const.PROCESSING)
-
-
-def unlock_maintenance(session):
-    return _update_maintenance_state(session, odl_const.PROCESSING,
-                                     odl_const.PENDING)
-
-
-def update_maintenance_operation(session, operation=None):
-    """Update the current maintenance operation details.
-
-    The function assumes the lock is held, so it mustn't be run outside of a
-    locked context.
-    """
-    op_text = None
-    if operation:
-        op_text = operation.__name__
-
-    with session.begin():
-        row = session.query(models.OpendaylightMaintenance).one_or_none()
-        row.processing_operation = op_text
-
-
-def delete_rows_by_state_and_time(session, state, time_delta):
-    with session.begin():
-        now = session.execute(func.now()).scalar()
-        session.query(models.OpendaylightJournal).filter(
-            models.OpendaylightJournal.state == state,
-            models.OpendaylightJournal.last_retried < now - time_delta).delete(
-            synchronize_session=False)
-        session.expire_all()
-
-
-def reset_processing_rows(session, max_timedelta):
-    with session.begin():
-        now = session.execute(func.now()).scalar()
-        max_timedelta = datetime.timedelta(seconds=max_timedelta)
-        rows = session.query(models.OpendaylightJournal).filter(
-            models.OpendaylightJournal.last_retried < now - max_timedelta,
-            models.OpendaylightJournal.state == odl_const.PROCESSING,
-            ).update({'state': odl_const.PENDING})
-
-    return rows

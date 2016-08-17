@@ -23,7 +23,7 @@ from oslo_serialization import jsonutils
 import requests
 import webob.exc
 
-from neutron.db import segments_db
+from neutron.common import constants as n_constants
 from neutron.extensions import portbindings
 from neutron.plugins.common import constants
 from neutron.plugins.ml2 import config as config
@@ -33,7 +33,6 @@ from neutron.plugins.ml2 import plugin
 from neutron.tests import base
 from neutron.tests.unit.plugins.ml2 import test_plugin
 from neutron.tests.unit import testlib_api
-from neutron_lib import constants as n_constants
 
 from networking_odl.common import client
 from networking_odl.common import constants as odl_const
@@ -208,6 +207,12 @@ class OpenDaylightMechanismTestPortsV2(test_plugin.TestMl2PortsV2,
             expected_status=webob.exc.HTTPConflict.code,
             expected_error='PortBound')
 
+    def test_create_router_port_and_fail_create_postcommit(self):
+        # Skip this test case for now as a workaround.
+        # TODO(rzang): remove this once [1] gets in.
+        # [1]https://review.openstack.org/#/c/310682/
+        self.skipTest("skip as a workaround")
+
 
 class DataMatcher(object):
 
@@ -222,9 +227,6 @@ class DataMatcher(object):
     def __eq__(self, s):
         data = jsonutils.loads(s)
         return self._data == data[self._object_type]
-
-    def __ne__(self, s):
-        return not self.__eq__(s)
 
 
 class OpenDaylightSyncTestCase(OpenDaylightTestCase):
@@ -376,8 +378,7 @@ class OpenDaylightMechanismDriverTestCase(base.BaseTestCase):
         context = self._get_mock_operation_context(object_type)
         url = '%s/%ss' % (config.cfg.CONF.ml2_odl.url, object_type)
         kwargs = {'url': url,
-                  'data': DataMatcher(odl_const.ODL_CREATE, object_type,
-                                      context)}
+                  'data': DataMatcher('create', object_type, context)}
         self._test_single_operation(method, context, status_code, exc_class,
                                     'post', **kwargs)
 
@@ -388,8 +389,7 @@ class OpenDaylightMechanismDriverTestCase(base.BaseTestCase):
         url = '%s/%ss/%s' % (config.cfg.CONF.ml2_odl.url, object_type,
                              context.current['id'])
         kwargs = {'url': url,
-                  'data': DataMatcher(odl_const.ODL_UPDATE, object_type,
-                                      context)}
+                  'data': DataMatcher('update', object_type, context)}
         self._test_single_operation(method, context, status_code, exc_class,
                                     'put', **kwargs)
 
@@ -401,20 +401,18 @@ class OpenDaylightMechanismDriverTestCase(base.BaseTestCase):
                              context.current['id'])
         kwargs = {'url': url, 'data': None}
         self._test_single_operation(method, context, status_code, exc_class,
-                                    odl_const.ODL_DELETE, **kwargs)
+                                    'delete', **kwargs)
 
     def test_create_network_postcommit(self):
-        self._test_create_resource_postcommit(odl_const.ODL_NETWORK,
+        self._test_create_resource_postcommit('network',
                                               requests.codes.created)
         for status_code in (requests.codes.bad_request,
                             requests.codes.unauthorized):
             self._test_create_resource_postcommit(
-                odl_const.ODL_NETWORK, status_code,
-                requests.exceptions.HTTPError)
+                'network', status_code, requests.exceptions.HTTPError)
 
     def test_create_subnet_postcommit(self):
-        self._test_create_resource_postcommit(odl_const.ODL_SUBNET,
-                                              requests.codes.created)
+        self._test_create_resource_postcommit('subnet', requests.codes.created)
         for status_code in (requests.codes.bad_request,
                             requests.codes.unauthorized,
                             requests.codes.forbidden,
@@ -422,12 +420,10 @@ class OpenDaylightMechanismDriverTestCase(base.BaseTestCase):
                             requests.codes.conflict,
                             requests.codes.not_implemented):
             self._test_create_resource_postcommit(
-                odl_const.ODL_SUBNET, status_code,
-                requests.exceptions.HTTPError)
+                'subnet', status_code, requests.exceptions.HTTPError)
 
     def test_create_port_postcommit(self):
-        self._test_create_resource_postcommit(odl_const.ODL_PORT,
-                                              requests.codes.created)
+        self._test_create_resource_postcommit('port', requests.codes.created)
         for status_code in (requests.codes.bad_request,
                             requests.codes.unauthorized,
                             requests.codes.forbidden,
@@ -436,34 +432,28 @@ class OpenDaylightMechanismDriverTestCase(base.BaseTestCase):
                             requests.codes.not_implemented,
                             requests.codes.service_unavailable):
             self._test_create_resource_postcommit(
-                odl_const.ODL_PORT, status_code,
-                requests.exceptions.HTTPError)
+                'port', status_code, requests.exceptions.HTTPError)
 
     def test_update_network_postcommit(self):
-        self._test_update_resource_postcommit(odl_const.ODL_NETWORK,
-                                              requests.codes.ok)
+        self._test_update_resource_postcommit('network', requests.codes.ok)
         for status_code in (requests.codes.bad_request,
                             requests.codes.forbidden,
                             requests.codes.not_found):
             self._test_update_resource_postcommit(
-                odl_const.ODL_NETWORK, status_code,
-                requests.exceptions.HTTPError)
+                'network', status_code, requests.exceptions.HTTPError)
 
     def test_update_subnet_postcommit(self):
-        self._test_update_resource_postcommit(odl_const.ODL_SUBNET,
-                                              requests.codes.ok)
+        self._test_update_resource_postcommit('subnet', requests.codes.ok)
         for status_code in (requests.codes.bad_request,
                             requests.codes.unauthorized,
                             requests.codes.forbidden,
                             requests.codes.not_found,
                             requests.codes.not_implemented):
             self._test_update_resource_postcommit(
-                odl_const.ODL_SUBNET, status_code,
-                requests.exceptions.HTTPError)
+                'subnet', status_code, requests.exceptions.HTTPError)
 
     def test_update_port_postcommit(self):
-        self._test_update_resource_postcommit(odl_const.ODL_PORT,
-                                              requests.codes.ok)
+        self._test_update_resource_postcommit('port', requests.codes.ok)
         for status_code in (requests.codes.bad_request,
                             requests.codes.unauthorized,
                             requests.codes.forbidden,
@@ -471,55 +461,50 @@ class OpenDaylightMechanismDriverTestCase(base.BaseTestCase):
                             requests.codes.conflict,
                             requests.codes.not_implemented):
             self._test_update_resource_postcommit(
-                odl_const.ODL_PORT, status_code,
-                requests.exceptions.HTTPError)
+                'port', status_code, requests.exceptions.HTTPError)
 
     def test_delete_network_postcommit(self):
-        self._test_delete_resource_postcommit(odl_const.ODL_NETWORK,
+        self._test_delete_resource_postcommit('network',
                                               requests.codes.no_content)
-        self._test_delete_resource_postcommit(odl_const.ODL_NETWORK,
+        self._test_delete_resource_postcommit('network',
                                               requests.codes.not_found)
         for status_code in (requests.codes.unauthorized,
                             requests.codes.conflict):
             self._test_delete_resource_postcommit(
-                odl_const.ODL_NETWORK, status_code,
-                requests.exceptions.HTTPError)
+                'network', status_code, requests.exceptions.HTTPError)
 
     def test_delete_subnet_postcommit(self):
-        self._test_delete_resource_postcommit(odl_const.ODL_SUBNET,
+        self._test_delete_resource_postcommit('subnet',
                                               requests.codes.no_content)
-        self._test_delete_resource_postcommit(odl_const.ODL_SUBNET,
+        self._test_delete_resource_postcommit('subnet',
                                               requests.codes.not_found)
         for status_code in (requests.codes.unauthorized,
                             requests.codes.conflict,
                             requests.codes.not_implemented):
             self._test_delete_resource_postcommit(
-                odl_const.ODL_SUBNET, status_code,
-                requests.exceptions.HTTPError)
+                'subnet', status_code, requests.exceptions.HTTPError)
 
     def test_delete_port_postcommit(self):
-        self._test_delete_resource_postcommit(odl_const.ODL_PORT,
+        self._test_delete_resource_postcommit('port',
                                               requests.codes.no_content)
-        self._test_delete_resource_postcommit(odl_const.ODL_PORT,
+        self._test_delete_resource_postcommit('port',
                                               requests.codes.not_found)
         for status_code in (requests.codes.unauthorized,
                             requests.codes.forbidden,
                             requests.codes.not_implemented):
             self._test_delete_resource_postcommit(
-                odl_const.ODL_PORT, status_code,
-                requests.exceptions.HTTPError)
+                'port', status_code, requests.exceptions.HTTPError)
 
     def test_port_emtpy_tenant_id_work_around(self):
         """Validate the work around code of port creation"""
         plugin = mock.Mock()
         plugin_context = mock.Mock()
-        network = self._get_mock_operation_context(
-            odl_const.ODL_NETWORK).current
-        port = self._get_mock_operation_context(odl_const.ODL_PORT).current
+        network = self._get_mock_operation_context('network').current
+        port = self._get_mock_operation_context('port').current
         tenant_id = network['tenant_id']
         port['tenant_id'] = ''
 
-        with mock.patch.object(segments_db, 'get_network_segments'):
+        with mock.patch.object(driver_context.db, 'get_network_segments'):
             context = driver_context.PortContext(
                 plugin, plugin_context, port, network, {}, 0, None)
             self.mech.odl_drv.FILTER_MAP[
@@ -530,16 +515,15 @@ class OpenDaylightMechanismDriverTestCase(base.BaseTestCase):
         """Validate the filter code on update port operation"""
         items_to_filter = ['network_id', 'id', 'status', 'tenant_id']
         plugin_context = mock.Mock()
-        network = self._get_mock_operation_context(
-            odl_const.ODL_NETWORK).current
-        subnet = self._get_mock_operation_context(odl_const.ODL_SUBNET).current
-        port = self._get_mock_operation_context(odl_const.ODL_PORT).current
+        network = self._get_mock_operation_context('network').current
+        subnet = self._get_mock_operation_context('subnet').current
+        port = self._get_mock_operation_context('port').current
         port['fixed_ips'] = [{'subnet_id': subnet['id'],
                               'ip_address': '10.0.0.10'}]
         port['mac_address'] = port['mac_address'].upper()
         orig_port = copy.deepcopy(port)
 
-        with mock.patch.object(segments_db, 'get_network_segments'):
+        with mock.patch.object(driver_context.db, 'get_network_segments'):
             context = driver_context.PortContext(
                 plugin, plugin_context, port, network, {}, 0, None)
             self.mech.odl_drv.FILTER_MAP[
