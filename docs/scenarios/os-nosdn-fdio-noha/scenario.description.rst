@@ -47,8 +47,8 @@ Tenant networking leverages FD.io/VPP. Open VSwitch (OVS) is used for all other
 connectivity, in particular the connectivity to public networking / the
 Internet (i.e. br-ext) is performed via OVS as in any standard OpenStack
 deployment. A VPP management agent is used to setup and manage layer 2
-networking for the scenario. Tenant networking can either leverage VLANs or
-plain interfaces. Layer 3 connectivity for a tenant network is provided
+networking for the scenario. Neutron ML2 plugin is configured to use
+the ML2-VPP networking mechanism driver. Tenant networking can either leverage VLANs or plain interfaces. Layer 3 connectivity for a tenant network is provided
 centrally via qrouter on the control node. As in a standard OpenStack
 deployment, the Layer3 agent configures the qrouter and associated rulesets for
 security (security groups) and NAT (floating IPs). Public IP network
@@ -69,6 +69,8 @@ Main features of the "apex-os-odl_l2-fdio-noha" scenario:
     on the Control node through standard OpenStack mechanisms.
     All layer 3 features apply, including floating IPs (i.e. NAT)
     and security groups.
+  * DHCP server for tenant instances provided using the standard 
+    OpenStack dnsmasq server.
 
 Networking in this scenario using VPP
 -------------------------------------
@@ -80,7 +82,8 @@ light-weight control plane agent for VPP forwarder has been created. For
 details see also https://github.com/naveenjoy/networking-vpp/
 
 Networking-vpp provides a Neutron ML2 mechanism driver to bring the advantages
-of VPP to OpenStack deployments.
+of VPP to OpenStack deployments. It uses an etcd cluster on the control node to
+keep track of the compute nodes, agent state and port bindings/unbindings. 
 
 It's been written to be as simple and readable as possible, which means it's
 naive; the aim was not to write the most efficient mechanism driver ever from
