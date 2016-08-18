@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_3204707a",
+        "filename": "docs/scenarios/os-nosdn-fdio-noha/scenario.description.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 251
+      },
+      "writtenOn": "2016-08-18T09:24:25Z",
+      "side": 1,
+      "message": "can you make sure you format things to 80 characters per line\n(set tw\u003d80)?",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 40
+      },
+      "revId": "cf7d2e2cab6beee2a69895fd8d624fa5d24690c1",
+      "serverId": "bbac25d2-bf60-4904-9ba8-a72fc000d6c5",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_d2f89c7e",
+        "filename": "docs/scenarios/os-nosdn-fdio-noha/scenario.description.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 251
+      },
+      "writtenOn": "2016-08-18T09:24:25Z",
+      "side": 1,
+      "message": "trailing whitespace",
+      "revId": "cf7d2e2cab6beee2a69895fd8d624fa5d24690c1",
+      "serverId": "bbac25d2-bf60-4904-9ba8-a72fc000d6c5",
+      "unresolved": false
+    }
+  ]
+}
