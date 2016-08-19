@@ -120,6 +120,19 @@ File "deploy_settings.yaml" choose opendaylight as controller with version
     vpn: false
     vpp: true
 
+Validated deployment environments
+=================================
+
+The "os-odl_l2-fdio-noha" scenario has been deployed and tested
+on the following sets of hardware:
+ * Linux Foundation lab (Chassis: Cisco UCS-B-5108 blade server,
+   NICs: 8 external / 32 internal 10GE ports,
+   RAM: 32G (4 x 8GB DDR4-2133-MHz RDIMM/PC4-17000/single rank/x4/1.2v),
+   CPU: 3.50 GHz E5-2637 v3/135W 4C/15MB Cache/DDR4 2133MHz
+   Disk: 1.2 TB 6G SAS 10K rpm SFF  HDD)
+ * Cisco internal development labs (UCS-B and UCS-C)
+
+
 Limitations, Issues and Workarounds
 ===================================
 
