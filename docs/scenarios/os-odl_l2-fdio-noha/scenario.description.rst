@@ -255,8 +255,9 @@ on the following sets of hardware:
    NICs: 8 external / 32 internal 10GE ports,
    RAM: 32G (4 x 8GB DDR4-2133-MHz RDIMM/PC4-17000/single rank/x4/1.2v),
    CPU: 3.50 GHz E5-2637 v3/135W 4C/15MB Cache/DDR4 2133MHz
-   Disk: 1.2 TB 6G SAS 10K rpm SFF  HDD)
- * CENGN development lab (Supermicro servers)
+   Disk: 1.2 TB 6G SAS 10K rpm SFF  HDD) see also:
+   https://wiki.opnfv.org/display/pharos/Lflab+Hosting
+ * OPNFV CENGN lab (https://wiki.opnfv.org/display/pharos/CENGN+Pharos+Lab)
  * Cisco internal development labs (UCS-B and UCS-C)
 
 Limitations, Issues and Workarounds
