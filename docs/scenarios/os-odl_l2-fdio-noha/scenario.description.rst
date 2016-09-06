@@ -231,7 +231,10 @@ settings in the APEX configuration files. Those are typically found in
 /etc/opnfv-apex.
 
 File "deploy_settings.yaml" choose opendaylight as controller with version
-"boron" and enable vpp as forwarder::
+"boron" and enable vpp as forwarder. "hugepages" need to set to a
+sufficiently large value for VPP to work. The default value for VPP is
+1024, but this only allows for a few VMs to be started. If feasible,
+choose a significantly larger number on the compute nodes::
 
   global_params:
     ha_enabled: false
@@ -240,11 +243,28 @@ File "deploy_settings.yaml" choose opendaylight as controller with version
     sdn_controller: opendaylight
     sdn_l3: false
     odl_version: boron
-    tacker: false
-    congress: false
+    tacker: true
+    congress: true
     sfc: false
     vpn: false
     vpp: true
+    dataplane: fdio
+    performance:
+      Controller:
+        kernel:
+          hugepages: 1024
+          hugepagesz: 2M
+          intel_iommu: 'on'
+          iommu: pt
+      Compute:
+        nova:
+          libvirtpin: 1
+        kernel:
+          hugepagesz: 2M
+          hugepages: 2048
+          intel_iommu: 'on'
+          iommu: pt
+
 
 Validated deployment environments
 =================================
