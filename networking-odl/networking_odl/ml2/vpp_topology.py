@@ -44,8 +44,21 @@ class VppNetworkTopologyParser(network_topology.NetworkTopologyParser):
                     # expected :
                     # "node-id": "name",
                     # "netconf-node-topology:host": "172.21.174.41"
-                    # "netconf-node-topology:available-capabilities": {
-                    #       "available-capability" : contains the v3po model
+                    # "netconf-node-topology:available-capabilities"
+                    # ^^
+                    # container available-capabilities {
+                    #     config false;
+                    #     leaf capability {
+                    #         type string;
+                    #     }
+                    #         leaf capability-origin {
+                    #             type enumeration {
+                    #                 enum user-defined;
+                    #                 enum device-advertised;
+                    #             }
+                    #         }
+                    #     }
+                    # }
                     node_name = node['node-id']
                     LOG.debug("Examining capabilities for node: %s\n",
                               node_name)
@@ -55,7 +68,7 @@ class VppNetworkTopologyParser(network_topology.NetworkTopologyParser):
                         LOG.debug("Node's capabilities: %s\n",
                                   capabilities)
                         for item in capabilities['available-capability']:
-                            if HC_VPP_CAPABILITY in item:
+                            if HC_VPP_CAPABILITY in item['capability']:
                                 LOG.debug("Found VPP matching capability for "
                                           "node: %s\n", node_name)
                                 element = elements_by_name.get(node_name)
