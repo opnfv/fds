@@ -27,7 +27,6 @@ sleep 7
 
 # SECOND VM
 echo "Creating second VM in the network and adding the security group to it"
-nova boot --image cirros-0.3.4 --flavor 1 --nic net-id=$net_id test-vm1
 nova boot --image cirros-0.3.4 --flavor 1 --nic net-id=$net_id test-vm2
 nova add-secgroup test-vm2 test-secgroup
 
