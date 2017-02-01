@@ -34,4 +34,4 @@ nova add-secgroup test-vm2 test-secgroup
 # FLOATING IP
 echo "Creating and associating floating IP for the first VM"
 floatingip_id=`neutron floatingip-create external | grep " id " | tr -s " " | cut -f 4 -d " "`
-neutron floatingip-associate $floatingip_id `neutron port-list | grep 192.168.20.3 | cut -d " " -f 2
+neutron floatingip-associate $floatingip_id `neutron port-list | grep 192.168.20.3 | cut -d " " -f 2`
