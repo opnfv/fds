@@ -1,0 +1,13 @@
+scheme: http
+host: localhost
+port: 8081
+username: admin
+password: admin
+
+key: id
+odl_nb_uris:
+  - '/controller/nb/v2/neutron/subnets'
+  - '/controller/nb/v2/neutron/networks'
+  - '/controller/nb/v2/neutron/ports'
+  - '/controller/nb/v2/neutron/security-groups'
+  - '/controller/nb/v2/neutron/security-group-rules'
