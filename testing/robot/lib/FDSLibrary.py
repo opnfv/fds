@@ -101,11 +101,27 @@ class FDSLibrary():
             time.sleep(5)
         return False
 
-    def create_security_group(self):
-        pass
+    def create_security_group(self, name):
+        body = {'security_group': {
+            'name': name
+        }}
+        response = self.neutron_client.create_security_group(body=body)
+        return response
 
-    def create_security_rule(self):
-        pass
+    def create_security_rule(self, sg_id, dir, eth, desc=None, proto=None, port_min=None, port_max=None, r_sg_id=None, r_prefix=None):
+        body = {'"security_group_rule"': {
+            '"security_group_id"': sg_id
+            '"description"': desc,
+            '"ethertype"': eth,
+            '"direction"': dir,
+            '"protocol"': proto,
+            '"port_range_min"': port_min,
+            '"port_range_max"': port_max,
+            '"remote_group_id"': r_sg_id,
+            '"remote_ip_prefix"': r_prefix
+        }}
+        response = self.neutron_client.create_security_group_rule(body=body)
+        return response
 
     def poll_server(self, vm_id, status, timeout=300):
         try:
@@ -142,6 +158,14 @@ class FDSLibrary():
 
     def delete_net(self, net_id):
         response = self.neutron_client.delete_network(net_id)
+        return response
+
+    def delete_security_group(self, sg_id):
+        response = self.neutron_client.delete_security_group(sg_id)
+        return response
+
+    def delete_security_rule(self, rule_id):
+        response = self.neutron_client.delete_security_group_rule(rule_id)
         return response
 
     def ping_vm(self, ip_address):
