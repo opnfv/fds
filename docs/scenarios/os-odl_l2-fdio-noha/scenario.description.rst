@@ -76,8 +76,8 @@ servers:
 
 .. image:: FDS-odl_l2-overview.png
 
-Tenant networking leverages FD.io/VPP. Open VSwitch (OVS) is used for all other
-connectivity, in particular the connectivity to public networking / the
+Tenant networking leverages FD.io/VPP. Open VSwitch (OVS) is used for all
+other connectivity, in particular the connectivity to public networking / the
 Internet (i.e. br-ext) is performed via OVS as in any standard OpenStack
 deployment. The OpenDaylight network controller is used to setup and manage
 layer 2 networking for the scenario. Tenant networking can either leverage
@@ -113,94 +113,45 @@ The apex-os-odl_l2-fdio-noha scenario combines components from three key open
 source projects: OpenStack, OpenDaylight, and Fast Data (FD.io). The key
 components that realize the apex-os-odl_l2-fdio-noha scenario and which differ
 from a regular, OVS-based scenario, are the OpenStack ML2 OpenDaylight plugin,
-OpenDaylight Neutron Northbound, OpenDaylight Group Based Policy, OpenDaylight
-Virtual Bridge Domain Manager, FD.io Honeycomb management agent and FD.io
-Vector Packet Processor (VPP).
+OpenDaylight Neutron Northbound, OpenDaylight (ODL) Group Based Policy (GBP),
+OpenDaylight Virtual Bridge Domain Manager (VBD), FD.io Honeycomb management
+agent and FD.io Vector Packet Processor (VPP).
 
 Here's a more detailed list of the individual software components involved:
 
-**Openstack Neutron ML2 ODL Plugin**: Handles Neutron data base synchronization
-and interaction with the southbound Openstack controller using HTTP.
+**Openstack Neutron ML2 OpenDaylight Plugin**: Handles Neutron data base
+synchronization and interaction with the southbound controller using a REST
+interface.
 
-**OpenDaylight Neutron Nothbound & Neutron MD-SAL Entry Store**: Presents a
-Neutron (v2) extended HTTP API servlet for interaction with Openstack Neutron.
-It validates and stores the received Neutron data in the MD-SAL data store
-against the Neutron yang model driven.
+**ODL GBP Neutron Mapper**: Maps neutron elements like networks, subnets,
+security groups, etc. to GBP entities: Creates policy and configuration for
+tenants (endpoints, resolved policies, forwarding rules).
 
-**OpenDaylight Neutron Mapper**: The Neutron Mapper listens to Neutron data
-change events and is responsible for using Neutron data in creating Group Based
-Policy Data objects, e.g. GBP End-Points, Flood-Domains. A GBP End Point
-represents a specific NFV/VM port and its identity as derived from a Neutron
-Port. The mapped data is stored using the GBP End Point yang model and an
-association between the GBP End-Point and its Neutron object is maintained in
-the Neutron-GBP map.
+**ODL GBP Neutron VPP Mapper**: Maps Neutron ports to VPP endpoints in GBP.
 
-**OpenDaylight Group Based Policy (GBP) Entities store**: Stores for the GBP
-data artifacts against the GBP YANG schemas.
+**ODL GBP Location Manager**: Provides real location for endpoints (i.e. Which
+physical node an endpoint is connected to).
 
-**Neutron Group Based Policy Map store**: Stores the bi-lateral relation
-between an End-Point and its corresponding Neutron object. Neutron-GBP map;
-keyed by Neutron object type, port, and Neutron UUID, gives the GBP End-Point,
-Flood domain respectively. GBP-Neutron map keyed by GBP object type, end-point.
+**GBP Renderer Manager**: Creates configuration for Renderers (like e.g.
+VPP-Renderer or OVS-Renderer). The GBP Renderer Manager is the central point
+for dispatching of data to specific device renderers.  It uses the information
+derived from the GBP end-point and its topology entries to dispatch the task
+of configuration to a specific device renderer by writing a renderer policy
+configuration into the registered renderer's policy store. The renderer
+manager also monitors, by being a data change listener on the VPP Renderer
+Policy States, for any errors in the application of a rendered configuration.
 
-**Neutron VPP Renderer Mapper**: The Neutron VPP Renderer Mapper listens to
-Neutron Store data change events, as well as being able to access directly the
-store, and is responsible for converting Neutron data specifically required to
-render a  VPP node configuration with a given End Point, e.g. the virtual host
-interface name assigned to a vhostuser socket.. The mapped data is stored in
-the VPP info data store.
+**GBP VPP Renderer – Interface Manager**: Listens to VPP endpoints in the
+Config DataStore and configures associated interfaces on VPP via HoneyComb.
 
-**VPP Info Store**: Stores VPP specific information regarding End-Points, Flood
-domains with VLAN, etc.
+**GBP VPP Renderer – Renderer Policy Manager**: Manages the creation of
+bridge domains using VBD and assigns interfaces to bridge domains.
 
-**GBP Renderer Manager**: The GBP Renderer Manager is the central point for
-dispatching of data to specific device renderers.  It uses the information
-derived from the GBP end-point and its topology entries to dispatch the task of
-configuration to a specific device renderer by writing a renderer policy
-configuration into the registered renderer's policy store. The renderer manager
-also monitors, by being a data change listener on the VPP Renderer Policy
-States, for any errors in the application of a rendered configuration.
-
-**Renderer Policy Config Store**: The store's schema serves as the API between
-the Renderer Manager and specific Renderers like the VPP Renderer. The store
-uses a a YANG modeled schema to represent all end-point and associated GBP
-policy data.
-
-**Topology Entries Store**: The yang model based MD-SAL topology store serves
-two fundamental roles: 1. It maintains a topological representation of the GBP
-End Points, in the context of customer networks. 2. It maintains an association
-of each (VPP) compute node's physical interfaces to their neutron provider
-network (e.g. The association between an ethernet interface and a Neutron
-provider network).
-
-**VPP Renderer**: The VPP Renderer registers an instance for VPP nodes with the
-Renderer Manager by means of inserting operational data into the Renderer
-Policy config store. It acts as a listener on the Renderer Policy consumes via
-the GBP Policy API data + the specific VPP End Point data, to drive the
-configuration of VPP devices using NETCONF Services.
-More specifically, the renderer generates:
-
-  * vhost user port configuration that corresponds to the VM port configuration
-  * VPP bridge instances corresponding to the GBP flood domain
-  * port or traffic filtering configuration, in accordance with the GBP policy.
-
-The VPP Renderer also interacts with the Virtual Bridge Domain Service, by
-means of the VBD store, in order to establish connectivity between VPP nodes in
-a bridge domain. For this it uses the VPP device name, and the flood domain
-data derived from the VPP Info and End-Point data respectively.  For the
-executed configuration operations it updates state in the Renderer policy state
-store.
-
-**Virtual Bridge Domain (VBD) Store and Manager**: The virtual bridge domain
-manager is responsible for configuring the VxLAN overlay tunnel infrastructure
-to arrive at a desired bridged topology between multiple (VPP) compute nodes.
-VDB configures VXLAN tunnels always into a full-mesh with split-horizon group
-forwarding applied on any domain facing tunnel interface (i.e. forwarding
-behavior will be that used for VPLS).
-
-**NETCONF Mount Point Service & Connector**: Collectively referred to as
-Netconf Services, provide the NETCONF interface for accessing VPP configuration
-and operational data stores that are represented as NETCONF mounts.
+**Virtual Bridge Domain Manager (VBD)**: Creates bridge domains (i.e. in case
+of VXLAN creates full mesh of VXLAN tunnels, configures split horizon on
+tunnel endpoints etc.). VDB configures VXLAN tunnels always into a full-mesh
+with split-horizon group forwarding applied on any domain facing tunnel
+interface (i.e. forwarding behavior will be that used for VPLS).
 
 **Virtual Packet Processor (VPP) and Honeycomb server**: The VPP is the
 accelerated data plane forwarding engine relying on vhost user interfaces
@@ -208,8 +159,6 @@ towards Virtual Machines created by the Nova Agent. The Honeycomb NETCONF
 configuration server is responsible for driving the configuration of the VPP,
 and collecting the operational data.
 
-**Rendered Policy State Store**: Stores data regarding the execution of
-operations performed by a given renderer.
 
 **Nova Agent**: The Nova Agent, a sub-component of the overall Openstack
 architecture, is responsible for interacting with the compute node's host
@@ -217,11 +166,9 @@ Libvirt API to drive the life-cycle of Virtual Machines. It, along with the
 compute node software, are assumed to be capable of supporting vhost user
 interfaces.
 
-The picture below show a basic end to end call flow for creating a Neutron
-vhostuser port on VPP using a GBP renderer. It showcases how the different
-component described above interact.
+The picture below show the key components.
 
-.. image:: FDS-basic-callflow.jpg
+.. image:: FDS-basic-components.jpg
 
 Scenario Configuration
 ======================
@@ -231,39 +178,47 @@ settings in the APEX configuration files. Those are typically found in
 /etc/opnfv-apex.
 
 File "deploy_settings.yaml" choose opendaylight as controller with version
-"boron" and enable vpp as forwarder. "hugepages" need to set to a
-sufficiently large value for VPP to work. The default value for VPP is
-1024, but this only allows for a few VMs to be started. If feasible,
-choose a significantly larger number on the compute nodes::
+"carbon" and enable vpp as forwarder. "hugepages" need to set to a
+sufficiently large value for VPP to work. The default value for VPP is 1024,
+but this only allows for a few VMs to be started. If feasible, choose a
+significantly larger number on the compute nodes::
 
-  global_params:
-    ha_enabled: false
+global_params:
+  ha_enabled: false
 
-  deploy_options:
-    sdn_controller: opendaylight
-    sdn_l3: false
-    odl_version: boron
-    tacker: true
-    congress: true
-    sfc: false
-    vpn: false
-    vpp: true
-    dataplane: fdio
-    performance:
-      Controller:
-        kernel:
-          hugepages: 1024
-          hugepagesz: 2M
-          intel_iommu: 'on'
-          iommu: pt
-      Compute:
-        nova:
-          libvirtpin: 1
-        kernel:
-          hugepagesz: 2M
-          hugepages: 2048
-          intel_iommu: 'on'
-          iommu: pt
+deploy_options:
+  sdn_controller: opendaylight
+  sdn_l3: false
+  odl_version: carbon
+  tacker: true
+  congress: true
+  sfc: false
+  vpn: false
+  vpp: true
+  dataplane: fdio
+  performance:
+    Controller:
+      kernel:
+        hugepages: 1024
+        hugepagesz: 2M
+        intel_iommu: 'on'
+        iommu: pt
+        isolcpus: 1,2
+      vpp:
+        main-core: 1
+        corelist-workers: 2
+        uio-driver: uio_pci_generic
+    Compute:
+      kernel:
+        hugepagesz: 2M
+        hugepages: 2048
+        intel_iommu: 'on'
+        iommu: pt
+        isolcpus: 1,2
+      vpp:
+        main-core: 1
+        corelist-workers: 2
+        uio-driver: uio_pci_generic
 
 
 Validated deployment environments
@@ -283,7 +238,7 @@ on the following sets of hardware:
 Limitations, Issues and Workarounds
 ===================================
 
-There are no known issues.
+For specific information on limitations and issues, please refer to the APEX installer release notes.
 
 References
 ==========
@@ -293,5 +248,5 @@ References
   * Fast Data (FD.io): https://fd.io/
   * FD.io Vector Packet Processor (VPP): https://wiki.fd.io/view/VPP
   * OpenDaylight Controller: https://www.opendaylight.org/
-  * OPNFV Colorado release - more information: http://www.opnfv.org/colorado
+  * OPNFV Carbon release - more information: http://www.opnfv.org/carbon
 
