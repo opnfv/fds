@@ -7,21 +7,33 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
+from keystoneauth1 import loading
+from keystoneauth1 import session
+from glanceclient import client as glance
 from neutronclient.v2_0 import client as neutron
 from novaclient import client as nova
 from novaclient.exceptions import NotFound
+from robot.api import logger
 import time
 import datetime
 import os
 import subprocess
 
+
 class FDSLibrary():
     def __init__(self):
+        logger.debug("Initializing glance client.")
+        self.glance_client = glance.Client('2', session=session.Session(
+            auth=loading.get_plugin_loader('password').load_from_options(auth_url=os.getenv('OS_AUTH_URL'),
+                                                                         username=os.getenv('OS_USERNAME'),
+                                                                         password=os.getenv('OS_PASSWORD'),
+                                                                         project_id=os.getenv('OS_PROJECT_ID'))))
+        logger.debug("Initializing neutron client.")
         self.neutron_client = neutron.Client(username=os.getenv('OS_USERNAME'),
                                              password=os.getenv('OS_PASSWORD'),
                                              tenant_name=os.getenv('OS_TENANT_NAME'),
                                              auth_url=os.getenv('OS_AUTH_URL'))
-
+        logger.debug("Initializing nova client.")
         self.nova_client = nova.Client('2',
                                        os.getenv('OS_USERNAME'),
                                        os.getenv('OS_PASSWORD'),
@@ -32,9 +44,24 @@ class FDSLibrary():
         flavor_list_names = [x.name for x in self.nova_client.flavors.list()]
         return flavor in flavor_list_names
 
+    def create_flavor(self, name, ram, vcpus="1", disk="0"):
+        response = self.nova_client.flavors.create(name, ram, vcpus, disk)
+        return response
+
     def check_image_exists(self, image):
-        image_list_names = [x.name for x in self.nova_client.images.list()]
+        image_list_names = [x.name for x in self.glance_client.images.list()]
         return image in image_list_names
+
+    def create_image(self, image_name, file_path, disk="qcow2",
+                     container="bare", public="public", property="hw_mem_page_size=large"):
+        image = self.glance_client.images.create(name=image_name,
+                                                 visibility=public,
+                                                 disk_format=disk,
+                                                 container_format=container,
+                                                 property=property)
+        with open(file_path) as image_data:
+            self.glance_client.images.upload(image.id, image_data)
+        return image.id
 
     def create_network(self, name):
         body = {'network': {'name': name}}
