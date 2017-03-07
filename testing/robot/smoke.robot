@@ -61,12 +61,8 @@ Setup Suite
     Set Suite Variable  ${port2_id}     ${None}
     Set Suite Variable  ${vm1_id}       ${None}
     Set Suite Variable  ${vm2_id}       ${None}
-    ${result} =     Check Flavor Exists     ${vm_flavor}
-    Log     ${vm_flavor}
-    Should be True      ${result}
-    ${result} =     Check Image Exists  ${vm_image}
-    Log     ${vm_image}
-    Should be True      ${result}
+    Ensure Image
+    Ensure Flavor
 
 Teardown Suite
     Run Keyword If  $vm1_id is not $None        Delete vm       ${vm1_id}
@@ -74,6 +70,20 @@ Teardown Suite
     Run Keyword If  $port1_id is not $None      Delete ports    ${port1_id}
     Run Keyword If  $port2_id is not $None      Delete ports    ${port2_id}
     Run Keyword If  $network_id is not $None    Delete network  ${network_id}
+
+Ensure Flavor
+    ${result} =     Check Flavor Exists     ${vm_flavor}
+    Return From Keyword If ${result} == 'True'
+    Create Flavor  ${vm_flavor}  ram=768
+    ${result} =     Check Flavor Exists     ${vm_flavor}
+    Should be True      ${result}
+
+Ensure Image
+    ${result} =     Check Image Exists  ${vm_image}
+    Return From Keyword If ${result} == 'True'
+    Create Image  ${vm_image}  /home/opnfv/functest/data/cirros-0.3.5-x86_64-disk.img
+    ${result} =     Check Image Exists  ${vm_image}
+    Should be True      ${result}
 
 Create tenant network
     &{response} =   create network  ${network_name}

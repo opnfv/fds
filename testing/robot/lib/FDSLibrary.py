@@ -7,6 +7,9 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
+from keystoneauth1 import loading
+from keystoneauth1 import session
+from glanceclient import client as glance
 from neutronclient.v2_0 import client as neutron
 from novaclient import client as nova
 from novaclient.exceptions import NotFound
@@ -17,6 +20,12 @@ import subprocess
 
 class FDSLibrary():
     def __init__(self):
+        self.glance_client = glance.Client()
+        loader = loading.get_plugin_loader('password')
+        auth = loader.load_from_options(auth_url=os.getenv('OS_AUTH_URL'), username=os.getenv('OS_USERNAME'), password=os.getenv('OS_PASSWORD'), project_id=os.getenv('OS_TENANT_NAME'))
+        session = session.Session(auth=auth)
+        self.glance_client = glance.Client('2', session=session)
+
         self.neutron_client = neutron.Client(username=os.getenv('OS_USERNAME'),
                                              password=os.getenv('OS_PASSWORD'),
                                              tenant_name=os.getenv('OS_TENANT_NAME'),
@@ -32,9 +41,23 @@ class FDSLibrary():
         flavor_list_names = [x.name for x in self.nova_client.flavors.list()]
         return flavor in flavor_list_names
 
+    def create_flavor(self, name, ram, vcpus="1", disk="0"):
+        response = self.nova_client.flavors.create(name, ram, vcpus, disk)
+        return response
+
     def check_image_exists(self, image):
-        image_list_names = [x.name for x in self.nova_client.images.list()]
+        image_list_names = [x.name for x in self.glance_client.images.list()]
         return image in image_list_names
+
+    def create_image(self, image_name, file_path, disk="qcow2",
+                        container="bare", public="public", property="hw_mem_page_size=large"):
+        # openstack image create --disk-format qcow2 --container-format bare --public --property hw_mem_page_size=large --file ./cirros-0.3.4-x86_64-disk.img cirros-0.3.4
+        image = self.glance_client.images.create(name=image_name,
+                                                 visibility=public,
+                                                 disk_format=disk,
+                                                 container_format=container,
+                                                 property=property)]
+        return image.id
 
     def create_network(self, name):
         body = {'network': {'name': name}}
