@@ -22,23 +22,19 @@ import subprocess
 
 class FDSLibrary():
     def __init__(self):
+        auth_obj = loading.get_plugin_loader('password').load_from_options(auth_url=os.getenv('OS_AUTH_URL'),
+                                                                           username=os.getenv('OS_USERNAME'),
+                                                                           password=os.getenv('OS_PASSWORD'),
+                                                                           project_id=os.getenv('OS_PROJECT_ID'))
         logger.debug("Initializing glance client.")
-        self.glance_client = glance.Client('2', session=session.Session(
-            auth=loading.get_plugin_loader('password').load_from_options(auth_url=os.getenv('OS_AUTH_URL'),
-                                                                         username=os.getenv('OS_USERNAME'),
-                                                                         password=os.getenv('OS_PASSWORD'),
-                                                                         project_id=os.getenv('OS_PROJECT_ID'))))
+        self.glance_client = glance.Client('2', session=session.Session(auth=auth_obj))
         logger.debug("Initializing neutron client.")
         self.neutron_client = neutron.Client(username=os.getenv('OS_USERNAME'),
                                              password=os.getenv('OS_PASSWORD'),
                                              tenant_name=os.getenv('OS_TENANT_NAME'),
                                              auth_url=os.getenv('OS_AUTH_URL'))
         logger.debug("Initializing nova client.")
-        self.nova_client = nova.Client('2',
-                                       os.getenv('OS_USERNAME'),
-                                       os.getenv('OS_PASSWORD'),
-                                       os.getenv('OS_TENANT_NAME'),
-                                       os.getenv('OS_AUTH_URL'))
+        self.nova_client = nova.Client('2', session=session.Session(auth=auth_obj))
 
     def check_flavor_exists(self, flavor):
         flavor_list_names = [x.name for x in self.nova_client.flavors.list()]
