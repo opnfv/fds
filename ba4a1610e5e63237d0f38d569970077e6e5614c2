@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dabed58f_50becb00",
+        "filename": "docs/scenarios/os-nosdn-fdio-ha/scenario.description.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 3889
+      },
+      "writtenOn": "2017-03-09T22:14:18Z",
+      "side": 1,
+      "message": "os-nosdn-fdio-ha",
+      "range": {
+        "startLine": 11,
+        "startChar": 1,
+        "endLine": 11,
+        "endChar": 12
+      },
+      "revId": "ba4a1610e5e63237d0f38d569970077e6e5614c2",
+      "serverId": "bbac25d2-bf60-4904-9ba8-a72fc000d6c5",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dabed58f_90c44393",
+        "filename": "docs/scenarios/os-nosdn-fdio-ha/scenario.description.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 3889
+      },
+      "writtenOn": "2017-03-09T22:14:18Z",
+      "side": 1,
+      "message": "doesn\u0027t add up",
+      "range": {
+        "startLine": 39,
+        "startChar": 60,
+        "endLine": 39,
+        "endChar": 61
+      },
+      "revId": "ba4a1610e5e63237d0f38d569970077e6e5614c2",
+      "serverId": "bbac25d2-bf60-4904-9ba8-a72fc000d6c5",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dabed58f_b0c14782",
+        "filename": "docs/scenarios/os-nosdn-fdio-ha/scenario.description.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 3889
+      },
+      "writtenOn": "2017-03-09T22:14:18Z",
+      "side": 1,
+      "message": "flat networks?",
+      "range": {
+        "startLine": 54,
+        "startChar": 9,
+        "endLine": 54,
+        "endChar": 25
+      },
+      "revId": "ba4a1610e5e63237d0f38d569970077e6e5614c2",
+      "serverId": "bbac25d2-bf60-4904-9ba8-a72fc000d6c5",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dabed58f_d0cabba0",
+        "filename": "docs/scenarios/os-nosdn-fdio-ha/scenario.description.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 3889
+      },
+      "writtenOn": "2017-03-09T22:14:18Z",
+      "side": 1,
+      "message": "I would recommend not including the content of the deployment settings file here, as this file does change. If you want to include a reference, maybe add a link to this file in Apex git repo.",
+      "revId": "ba4a1610e5e63237d0f38d569970077e6e5614c2",
+      "serverId": "bbac25d2-bf60-4904-9ba8-a72fc000d6c5",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dabed58f_f0cfbfae",
+        "filename": "docs/scenarios/os-nosdn-fdio-ha/scenario.description.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 3889
+      },
+      "writtenOn": "2017-03-09T22:14:18Z",
+      "side": 1,
+      "message": "Add link to Apex.",
+      "revId": "ba4a1610e5e63237d0f38d569970077e6e5614c2",
+      "serverId": "bbac25d2-bf60-4904-9ba8-a72fc000d6c5",
+      "unresolved": false
+    }
+  ]
+}
