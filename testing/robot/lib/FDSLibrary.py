@@ -36,12 +36,17 @@ class FDSLibrary():
         logger.debug("Initializing nova client.")
         self.nova_client = nova.Client('2', session=session.Session(auth=auth_obj))
 
-    def check_flavor_exists(self, flavor):
-        flavor_list_names = [x.name for x in self.nova_client.flavors.list()]
-        return flavor in flavor_list_names
+   def check_flavor_exists(self):
+        flavor_ids = [x.id for x in self.nova_client.flavors.list(min_ram=760)]
+        for f_id in flavor_ids:
+            for key in self.nova_client.flavors.get(f_id).get_keys():
+                if "mem_page_size" in key:
+                    logger.console("Found image with memory-setting: " + f_id)
+                    return f_id
 
     def create_flavor(self, name, ram, vcpus="1", disk="0"):
         response = self.nova_client.flavors.create(name, ram, vcpus, disk)
+        response.set_keys({'hw:mem_page_size': 'large'})
         return response
 
     def check_image_exists(self, image):
