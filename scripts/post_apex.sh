@@ -26,9 +26,9 @@ IFS=$'\n'
 nova_list=`ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null stack@$undercloud_ip ". stackrc && nova list | tail -n+4 | head -n-1 | sed 's/ //g'" 2> /dev/null`
 node_list=($nova_list)
 IFS="$OIFS"
-echo
 for node in "${node_list[@]}"
 do
+    echo
     node_fields=`echo $node | cut -d "|" -f 3,7`
     node_name=`echo $node_fields | cut -d "|" -f 1`
     node_ip=`echo $node_fields | cut -d "=" -f 2`
