@@ -56,7 +56,7 @@ Wait for VM1 to be active
 
 Create VM2
     ${port_ids} =   Create List     ${port2_id}
-    ${result} =     Create vm       ${vm2_name}     ${port_ids}     userdata=${userdata2}
+    ${result} =     Create vm       ${vm2_name}     ${port_ids}    flavor=${flavor_to_use}     userdata=${userdata2}
     Set Suite Variable  ${vm2_id}   ${result}
 
 Wait for VM2 to be active
