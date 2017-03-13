@@ -9,9 +9,9 @@
 
 *** Settings ***
 Library         OperatingSystem
-Library         lib/FDSLibrary.py
-Library         lib/Keywords.robot
-Variables       data/test_data.py
+Library         ../robot/lib/FDSLibrary.py
+Library         ../robot/lib/Keywords.robot
+Variables       ../robot/data/test_data.py
 Suite Setup     Setup Suite
 Suite Teardown  Teardown Suite
 
@@ -34,7 +34,8 @@ Create port for VM2
 
 Create VM1
     ${port_ids} =   Create List     ${port1_id}
-    ${result} =     Create vm       ${vm1_name}     ${port_ids}     userdata=${userdata1}
+    ${result} =     Create vm       ${vm1_name}     ${port_ids}    flavor=${flavor_to_use}
+    ...    userdata=${userdata1}
     Set Suite Variable  ${vm1_id}   ${result}
 
 Wait for VM1 to be active

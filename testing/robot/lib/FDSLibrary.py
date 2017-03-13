@@ -36,9 +36,11 @@ class FDSLibrary():
         logger.debug("Initializing nova client.")
         self.nova_client = nova.Client('2', session=session.Session(auth=auth_obj))
 
-    def check_flavor_exists(self, flavor):
-        flavor_list_names = [x.name for x in self.nova_client.flavors.list()]
-        return flavor in flavor_list_names
+    def check_flavor_exists(self):
+        flavor_list = [x.name for x in self.nova_client.flavors.list()]
+        for flavor in flavor_list:
+        if "huge_pages" in flavor.extra_specs:
+            return flavor.id
 
     def create_flavor(self, name, ram, vcpus="1", disk="0"):
         response = self.nova_client.flavors.create(name, ram, vcpus, disk)

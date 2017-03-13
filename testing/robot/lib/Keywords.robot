@@ -16,10 +16,12 @@ Variables       ../data/test_data.py
 
 Ensure Flavor
     ${result} =     Check Flavor Exists     ${vm_flavor}
-    Return From Keyword If  '${result}' == 'True'
+    Set Suite Variable  ${flavor_to_use}    ${result}
+    Return From Keyword If  '${result}' == '${EMPTY}'
     Create Flavor  ${vm_flavor}  ram=768
-    ${result} =     Check Flavor Exists     ${vm_flavor}
-    Should be True      ${result}
+    ${result} =     Check Flavor Exists
+    Set Suite Variable  ${flavor_to_use}    ${result}
+    Should Not Be Empty    ${result}
 
 Ensure Image
     ${result} =     Check Image Exists  ${vm_image}
@@ -75,9 +77,9 @@ Create port with ip
     [Return]    ${response.port['id']}
 
 Create vm
-    [Arguments]     ${vm_name}     ${port_ids}  ${security_groups}=${None}  ${userdata}=${None}
-    Log Many    ${vm_name}  ${vm_image}     ${vm_flavor}    ${port_ids}     ${userdata}
-    ${response} =   create server   ${vm_name}     ${vm_image}     ${vm_flavor}    ${port_ids}  ${security_groups}
+    [Arguments]     ${vm_name}     ${port_ids}    ${flavor}=${vm_flavor}    ${security_groups}=${None}  ${userdata}=${None}
+    Log Many    ${vm_name}  ${vm_image}     ${flavor}    ${port_ids}     ${userdata}
+    ${response} =   create server   ${vm_name}     ${vm_image}     ${flavor}    ${port_ids}  ${security_groups}
     ...                             ${userdata}
     log many    ${response}
     log         ${response.id}
