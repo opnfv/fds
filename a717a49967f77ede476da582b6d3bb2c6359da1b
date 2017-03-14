@@ -22,6 +22,30 @@
       "revId": "a717a49967f77ede476da582b6d3bb2c6359da1b",
       "serverId": "bbac25d2-bf60-4904-9ba8-a72fc000d6c5",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab8dda7_70946637",
+        "filename": "testing/robot/lib/Keywords.robot",
+        "patchSetId": 6
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 3697
+      },
+      "writtenOn": "2017-03-14T11:46:31Z",
+      "side": 1,
+      "message": "When I tried using vm_flavor and the flavor existed but had a different name it didn\u0027t work - the test tried to use nfv-fds which didn\u0027t exists.",
+      "parentUuid": "9ab8dda7_b072de47",
+      "range": {
+        "startLine": 82,
+        "startChar": 62,
+        "endLine": 82,
+        "endChar": 75
+      },
+      "revId": "a717a49967f77ede476da582b6d3bb2c6359da1b",
+      "serverId": "bbac25d2-bf60-4904-9ba8-a72fc000d6c5",
+      "unresolved": false
     }
   ]
 }
