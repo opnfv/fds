@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ab8dda7_b072de47",
+        "filename": "testing/robot/lib/Keywords.robot",
+        "patchSetId": 6
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5559
+      },
+      "writtenOn": "2017-03-14T11:43:26Z",
+      "side": 1,
+      "message": "I relied rather on static field just in case, b/c flavor_to_use is set dynamically. However if you approve this then it works for me too.",
+      "range": {
+        "startLine": 82,
+        "startChar": 62,
+        "endLine": 82,
+        "endChar": 75
+      },
+      "revId": "a717a49967f77ede476da582b6d3bb2c6359da1b",
+      "serverId": "bbac25d2-bf60-4904-9ba8-a72fc000d6c5",
+      "unresolved": false
+    }
+  ]
+}
