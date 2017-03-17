@@ -32,10 +32,12 @@ do
     node_fields=`echo $node | cut -d "|" -f 3,7`
     node_name=`echo $node_fields | cut -d "|" -f 1`
     node_ip=`echo $node_fields | cut -d "=" -f 2`
-    echo "adding $node_name to /etc/hosts"
+    echo "Adding $node_name to /etc/hosts"
     echo $node_ip $node_name >> /etc/hosts
-    echo "removing $node_ip from known hosts"
+    echo "Removing $node_ip from known hosts"
     sed -i "/$node_ip/d" /root/.ssh/known_hosts
+    echo "Removing $node_name from known hosts"
+    sed -i "/$node_name/d" /root/.ssh/known_hosts
     echo "Setting up ssh keys on $node_name for root"
     ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null stack@$undercloud_ip "/home/stack/copy_keys.sh $node_ip &" 2> /dev/null
     echo "Copying overcloudrc to $node_name"
@@ -57,8 +59,8 @@ do
     fi
 done
 . $overcloudrc_path
-openstack flavor list | grep nfv > /dev/null
 echo
+openstack flavor list | grep nfv > /dev/null
 if [[ ! $? -eq 0 ]]
 then
     echo "Configuring flavor nfv"
@@ -67,8 +69,8 @@ else
     echo "Flavor nfv is already configured"
 fi
 
-openstack image list | grep cirros-0.3.4 > /dev/null
 echo
+openstack image list | grep cirros-0.3.4 > /dev/null
 if [[ ! $? -eq 0 ]]
 then
     echo "Configuring image cirros-0.3.4"
