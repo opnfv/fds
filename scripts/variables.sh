@@ -1,0 +1,9 @@
+overcloud_file_name=overcloudrc # change this if needed
+odl_username=admin
+odl_password=admin
+odl_port=8081
+vpp_username=admin
+vpp_password=admin
+vpp_port=2831
+NODE_PATTERN=overcloud
+overcloudrc_path=/root/$overcloud_file_name

@@ -5,6 +5,8 @@ display_usage() {
   exit 85
 }
 
+. $(dirname $0)/variables.sh
+
 if [  $# -lt 3 ]
 then
   display_usage
@@ -15,13 +17,10 @@ odl_ip=$1
 vpp_host=$2
 vpp_ip=$3
 
-vpp_username=admin
-vpp_password=admin
-
 post_data='{"node" : [
 {"node-id":"'$vpp_host'",
 "netconf-node-topology:host":"'$vpp_ip'",
-"netconf-node-topology:port":"2831",
+"netconf-node-topology:port":"$vpp_port",
 "netconf-node-topology:tcp-only":false,
 "netconf-node-topology:keepalive-delay":0,
 "netconf-node-topology:username":"'$vpp_username'",
@@ -35,4 +34,4 @@ post_data='{"node" : [
 }
 '
 
-curl -u admin:admin -X POST -d "$post_data" -H 'Content-Type: application/json' http://$odl_ip:8081/restconf/config/network-topology:network-topology/network-topology:topology/topology-netconf/
+curl -u $odl_username:$odl_password -X POST -d "$post_data" -H 'Content-Type: application/json' http://$odl_ip:$odl_port/restconf/config/network-topology:network-topology/network-topology:topology/topology-netconf/
