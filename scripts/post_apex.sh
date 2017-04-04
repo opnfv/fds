@@ -1,7 +1,5 @@
 #!/bin/bash
-overcloud_file_name=overcloudrc # change this if needed
-NODE_PATTERN=overcloud
-overcloudrc_path=/root/$overcloud_file_name
+. $(dirname "$0")/variables.sh
 undercloud_ip=`arp -a | grep $(virsh domiflist undercloud | grep default | awk '{print $5}') | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+"`
 #echo $undercloud_ip
 

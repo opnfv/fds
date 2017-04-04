@@ -5,7 +5,7 @@ neutron net-create test-net
 neutron subnet-create --name test-subnet test-net 192.168.20.0/24
 
 # ATTACH NETWORK TO ROUTER
-echo "Attaching external and tenant networks to reouter"
+echo "Attaching external and tenant networks to router"
 neutron router-create test-router
 neutron router-interface-add test-router test-subnet
 neutron router-gateway-set test-router external
