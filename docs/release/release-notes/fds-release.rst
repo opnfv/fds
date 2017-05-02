@@ -31,7 +31,10 @@ Version history
 |            |          |                  |                           |
 +------------+----------+------------------+---------------------------+
 | 2017-03-30 | 1.0.0    | Frank Brockners  | FastDataStacks for Danube |
-|            |          | (Cisco)          | release                   |
+|            |          | (Cisco)          | 1.0 release               |
++------------+----------+------------------+---------------------------+
+| 2017-05-02 | 2.0.0    | Frank Brockners  | FastDataStacks for Danube |
+|            |          | (Cisco)          | 2.0 release               |
 +------------+----------+------------------+---------------------------+
 
 
@@ -100,6 +103,23 @@ Release Data
 |                                      |                                      |
 +--------------------------------------+--------------------------------------+
 
++--------------------------------------+--------------------------------------+
+| **Project**                          | FastDataStacks                       |
+|                                      |                                      |
++--------------------------------------+--------------------------------------+
+| **Repo/tag**                         | danube.2.0                           |
+|                                      |                                      |
++--------------------------------------+--------------------------------------+
+| **Release designation**              | Danube enhancements release          |
+|                                      |                                      |
++--------------------------------------+--------------------------------------+
+| **Release date**                     | May 4st    2017                      |
+|                                      |                                      |
++--------------------------------------+--------------------------------------+
+| **Purpose of the delivery**          | Danube enhancements release          |
+|                                      |                                      |
++--------------------------------------+--------------------------------------+
+
 FastDataStacks Scenarios in Danube 1.0
 ======================================
 
@@ -120,11 +140,37 @@ In release Danube 1.0, FastDataStacks releases the following scenarios:
 
 All of the scenarios are installed using the APEX installer.
 
+
+FastDataStacks Scenarios in Danube 2.0
+======================================
+
+In release Danube 1.0, FastDataStacks releases the following scenarios:
+
+ * `os-nosdn-fdio-noha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-nosdn-fdio-noha/index.html>`_:
+  OpenStack (with Neutron networking-vpp mechanism driver), VPP
+ * `os-odl_l2-fdio-ha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-odl_l2-fdio-ha/index.html>`_:
+  OpenStack (in a high-availability setup),
+  OpenDaylight (for Layer 2 networking control),
+  HoneyComb, VPP
+ * `os-odl_l2-fdio-noha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-odl_l2-fdio-noha/index.html>`_:
+  OpenStack, OpenDaylight (for Layer 2 networking control),
+  HoneyComb, VPP
+ * `os-odl_l3-fdio-noha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-odl_l3-fdio-noha/index.html>`_:
+  OpenStack, OpenDaylight (for Layer 2 and Layer 3 networking control),
+  HoneyComb, VPP
+ * `os-odl_l3-fdio-ha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-odl_l3-fdio-ha/index.html>`_:
+  OpenStack (in a high-availability setup), OpenDaylight (for Layer 2 and Layer 3 networking control in clustered mode),
+  HoneyComb, VPP
+
+
+All of the scenarios are installed using the APEX installer.
+
+
 Known Issues/Restrictions
 =========================
 
-Scenario os-nosdn-fdio-noha known issues
-----------------------------------------
+Scenario os-nosdn-fdio-noha known issues in Danube 1.0
+------------------------------------------------------
 
 * `FDS-156 <https://jira.opnfv.org/browse/FDS-156>`_:
   os-nosdn-fdio-noha scenario:
@@ -147,8 +193,8 @@ Scenario os-nosdn-fdio-noha known issues
   of https proxy issue
 
 
-Scenario os-odl_l2-fdio-noha known issues
------------------------------------------
+Scenario os-odl_l2-fdio-noha known issues in Danube 1.0
+-------------------------------------------------------
 
 * `FDS-264 <https://jira.opnfv.org/browse/FDS-264>`_:
   ODL sometimes creates vxlan on incorrect host
@@ -156,8 +202,8 @@ Scenario os-odl_l2-fdio-noha known issues
   Refstack testcase ImagesOneServerTestJSON.
   test_create_delete_image failure
 
-Scenario os-odl_l2-fdio-ha known issues
----------------------------------------
+Scenario os-odl_l2-fdio-ha known issues in Danube 1.0
+-----------------------------------------------------
 
 * `FDS-264 <https://jira.opnfv.org/browse/FDS-264>`_:
   ODL sometimes creates vxlan on incorrect host
@@ -165,8 +211,8 @@ Scenario os-odl_l2-fdio-ha known issues
   Refstack testcase ImagesOneServerTestJSON.
   test_create_delete_image failure
 
-Scenario os-odl_l3-fdio-noha known issues
------------------------------------------
+Scenario os-odl_l3-fdio-noha known issues in Danube 1,0
+-------------------------------------------------------
 
 Note that a set of manual configration steps need to be performed
 post an automated deployment for the scenario to be fully functional.
@@ -188,4 +234,67 @@ for details.
 * `APEX-420 <https://jira.opnfv.org/browse/APEX-420>`_:
   Public and tenant interface configuration in odl for
   fdio_l3 noha scenario
+
+Scenario os-nosdn-fdio-noha known issues in Danube 2.0
+------------------------------------------------------
+
+* `FDS-156 <https://jira.opnfv.org/browse/FDS-156>`_:
+  os-nosdn-fdio-noha scenario:
+  Race conditions for network-vif-plugged notification
+* `FDS-160 <https://jira.opnfv.org/browse/FDS-160>`_:
+  os-nosdn-fdio-noha scenario: Vlan fix on controller
+* `FDS-272 <https://jira.opnfv.org/browse/FDS-272>`_:
+  os-nosdn-fdio-noha scenario/domino fails because
+  of https proxy issue
+
+
+Scenario os-odl_l2-fdio-noha known issues in Danube 2.0
+-------------------------------------------------------
+
+* `FDS-324 <https://jira.opnfv.org/browse/FDS-324>`_:
+  Clone of APEX-449 - Domino fails in ci
+* `FDS-325 <https://jira.opnfv.org/browse/FDS-325>`_:
+  4 Refstack testcases fail - qrouter tap port issue
+
+Scenario os-odl_l2-fdio-ha known issues in Danube 2.0
+-----------------------------------------------------
+
+* `FDS-324 <https://jira.opnfv.org/browse/FDS-324>`_:
+  Clone of APEX-449 - Domino fails in ci
+* `FDS-325 <https://jira.opnfv.org/browse/FDS-325>`_:
+  4 Refstack testcases fail - qrouter tap port issue
+
+Scenario os-odl_l3-fdio-noha known issues in Danube 2.0
+-------------------------------------------------------
+
+Note that a set of manual configration steps need to be performed
+post an automated deployment for the scenario to be fully functional.
+Please refer to `APEX-420 <https://jira.opnfv.org/browse/APEX-420>`_
+and `APEX 445 <https://jira.opnfv.org/browse/APEX-445>`_ for details.
+
+* `FDS-324 <https://jira.opnfv.org/browse/FDS-324>`_:
+  Clone of APEX-449 - Domino fails in ci
+* `FDS-325 <https://jira.opnfv.org/browse/FDS-325>`_:
+  4 Refstack testcases fail - qrouter tap port issue
+* `FDS-333 <https://jira.opnfv.org/browse/FDS-333>`_:
+  Tempest failures in l3 scenarios 
+* `FDS-334 <https://jira.opnfv.org/browse/FDS-334>`_:
+  Refstack failures in l3 scenarios 
+
+Scenario os-odl_l3-fdio-ha known issues in Danube 2.0
+-----------------------------------------------------
+
+Note that a set of manual configration steps need to be performed
+post an automated deployment for the scenario to be fully functional.
+Please refer to `APEX-420 <https://jira.opnfv.org/browse/APEX-420>`_
+and `APEX 445 <https://jira.opnfv.org/browse/APEX-445>`_ for details.
+  
+* `FDS-324 <https://jira.opnfv.org/browse/FDS-324>`_:
+  Clone of APEX-449 - Domino fails in ci
+* `FDS-325 <https://jira.opnfv.org/browse/FDS-325>`_:
+  4 Refstack testcases fail - qrouter tap port issue
+* `FDS-333 <https://jira.opnfv.org/browse/FDS-333>`_:
+  Tempest failures in l3 scenarios 
+* `FDS-334 <https://jira.opnfv.org/browse/FDS-334>`_:
+  Refstack failures in l3 scenarios
 
