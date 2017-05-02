@@ -5,11 +5,11 @@
 .. http://creativecommons.org/licenses/by/4.0
 
 
-***********************************************************************
-Fast Data Stacks Scenario: os-odl_l3-fdio-noha Overview and Description
-***********************************************************************
+*********************************************************************
+Fast Data Stacks Scenario: os-odl_l3-fdio-ha Overview and Description
+*********************************************************************
 
-Scenario: "OpenStack - Opendaylight (L3) - FD.io" (apex-os-odl_l3-fdio-noha)
+Scenario: "OpenStack - Opendaylight (L3) - FD.io" (apex-os-odl_l3-fdio-ha)
 is a scenario developed as part of the FastDataStacks
 OPNFV project.
 
