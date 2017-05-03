@@ -1,4 +1,4 @@
-.. _os-odl_l3-fdio-noha:
+.. _os-odl_l3-fdio-ha:
 
 .. OPNFV - Open Platform for Network Function Virtualization
 .. This work is licensed under a Creative Commons Attribution 4.0 International License.
