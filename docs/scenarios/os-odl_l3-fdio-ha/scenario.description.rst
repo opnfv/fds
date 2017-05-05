@@ -266,8 +266,8 @@ compute node will serve as layer 3 gateway::
 Limitations, Issues and Workarounds
 ===================================
 
-For specific information on limitations and issues, please refer to the APEX
-installer release notes.
+For specific information on limitations and issues, please refer to the
+FastDataStacks (FDS) release notes.
 
 References
 ==========

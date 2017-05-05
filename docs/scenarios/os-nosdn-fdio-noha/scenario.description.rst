@@ -137,7 +137,8 @@ on the following sets of hardware:
 Limitations, Issues and Workarounds
 ===================================
 
-There are no known issues.
+For specific information on limitations and issues, please refer to the
+FastDataStacks (FDS) release notes.
 
 References
 ==========
