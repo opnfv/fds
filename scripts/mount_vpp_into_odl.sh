@@ -5,7 +5,7 @@ display_usage() {
   exit 85
 }
 
-. $(dirname $0)/variables.sh
+. $(dirname $0)/lib.sh
 
 if [  $# -lt 3 ]
 then
