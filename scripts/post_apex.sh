@@ -1,5 +1,5 @@
 #!/bin/bash
-. $(dirname "$0")/variables.sh
+. $(dirname "$0")/lib.sh
 undercloud_ip=`arp -a | grep $(virsh domiflist undercloud | grep default | awk '{print $5}') | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+"`
 #echo $undercloud_ip
 
@@ -41,8 +41,8 @@ do
     echo "Copying overcloudrc to $node_name"
     scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $overcloudrc_path heat-admin@$node_ip:. 2> /dev/null
     ssh -oStrictHostKeyChecking=no heat-admin@$node_ip 'sudo cp /home/heat-admin/overcloudrc /root' 2> /dev/null
-    echo "Cloning fds repo on $node_name to /root/fds"
-    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $node_name 'git clone https://gerrit.opnfv.org/gerrit/p/fds.git /root/fds' 2> /dev/null
+    echo "Cloning fds repo on $node_name to $overcloud_fds_repo_loc"
+    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $node_name 'git clone https://gerrit.opnfv.org/gerrit/p/fds.git $overcloud_fds_repo_loc' 2> /dev/null
     if [[ $node_name = *'controller'* ]]
     then
         echo "Setting debugs for nova and neutron on $node_name"
