@@ -8,3 +8,18 @@ vpp_password=admin
 vpp_port=2831
 NODE_PATTERN=overcloud
 overcloudrc_path=/root/$overcloud_file_name
+
+in_array() {
+    key=$1
+    shift
+    items=$@
+    for item in $items
+    do
+        if [ $item == $key ]
+        then
+            return 0
+            break
+        fi
+    done
+    return 1
+}
