@@ -1,6 +1,6 @@
 #!/bin/bash
-script_dir=$(dirname $0)
-. $script_dir/lib.sh
+SCRIPT_DIR=$(dirname $0)
+. $SCRIPT_DIR/lib.sh
 
 NODE_TYPES="compute controller"
 RESOURCE_TYPES="openstack opendaylight fdio"
@@ -141,7 +141,7 @@ clean_from_jumphost() {
     echo "Cleanup finished"
     if [[ $REMOUNT ]]
     then
-        $script_dir/remount_vpp_into_odl.sh
+        $SCRIPT_DIR/remount_vpp_into_odl.sh
     fi
 }
 
@@ -201,11 +201,11 @@ clean_overcloud_resource() {
             if [[ $MANUAL_CONFIG ]]
             then
                 TENANT_INTERFACE_IP=$(vppctl show int $TENANT_INTERFACE addr \
-                    | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+")
+                    | grep -Eo "$IPV4_REGEX")
                 if [[ -n $PUBLIC_INTERFACE ]]
                 then
                     PUBLIC_INTERFACE_IP=$(vppctl show int $PUBLIC_INTERFACE addr \
-                        n| grep -Eo "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+")
+                        n| grep -Eo "$IPV4_REGEX")
                 fi
             fi
 
@@ -239,7 +239,7 @@ clean_overcloud_resource() {
             sleep 1
             service honeycomb start &> /dev/null
             echo "$HOSTNAME: starting honeycomb"
-            HC_IP=$(grep restconf-binding-address /opt/honeycomb/config/honeycomb.json | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+")
+            HC_IP=$(grep restconf-binding-address /opt/honeycomb/config/honeycomb.json | grep -Eo "$IPV4_REGEX")
             HC_PORT=$(grep restconf-port /opt/honeycomb/config/honeycomb.json | grep -Eo [0-9]+)
             for i in $(seq 1 30)
             do
@@ -378,7 +378,7 @@ else
     if [[ $ODL_RESTARTED ]]
     then
         ODL_IP=$(awk '/<Call/{f=1} f{print; if (/<\/Call>/) exit}' $ODL_DIR/etc/jetty.xml | \
-            grep -Eo "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+")
+            grep -Eo "$IPV4_REGEX")
         ODL_PORT=$(awk '/<Call/{f=1} f{print; if (/<\/Call>/) exit}' $ODL_DIR/etc/jetty.xml | \
             grep jetty.port | grep -Eo [0-9]+)
         echo "$HOSTNAME: waiting for odl to start"
