@@ -36,6 +36,9 @@ Version history
 | 2017-05-02 | 2.0.0    | Frank Brockners  | FastDataStacks for Danube |
 |            |          | (Cisco)          | 2.0 release               |
 +------------+----------+------------------+---------------------------+
+| 2017-06-07 | 3.0.0    | Juraj Linkes     | FastDataStacks for Danube |
+|            |          | (Cisco)          | 3.0 release               |
++------------+----------+------------------+---------------------------+
 
 
 OPNFV Danube Release
@@ -120,6 +123,23 @@ Release Data
 |                                      |                                      |
 +--------------------------------------+--------------------------------------+
 
++--------------------------------------+--------------------------------------+
+| **Project**                          | FastDataStacks                       |
+|                                      |                                      |
++--------------------------------------+--------------------------------------+
+| **Repo/tag**                         | danube.3.0                           |
+|                                      |                                      |
++--------------------------------------+--------------------------------------+
+| **Release designation**              | Danube enhancements release          |
+|                                      |                                      |
++--------------------------------------+--------------------------------------+
+| **Release date**                     | Jun 8th    2017                      |
+|                                      |                                      |
++--------------------------------------+--------------------------------------+
+| **Purpose of the delivery**          | Danube enhancements release          |
+|                                      |                                      |
++--------------------------------------+--------------------------------------+
+
 FastDataStacks Scenarios in Danube 1.0
 ======================================
 
@@ -144,7 +164,32 @@ All of the scenarios are installed using the APEX installer.
 FastDataStacks Scenarios in Danube 2.0
 ======================================
 
-In release Danube 1.0, FastDataStacks releases the following scenarios:
+In release Danube 2.0, FastDataStacks releases the following scenarios:
+
+ * `os-nosdn-fdio-noha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-nosdn-fdio-noha/index.html>`_:
+  OpenStack (with Neutron networking-vpp mechanism driver), VPP
+ * `os-odl_l2-fdio-ha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-odl_l2-fdio-ha/index.html>`_:
+  OpenStack (in a high-availability setup),
+  OpenDaylight (for Layer 2 networking control),
+  HoneyComb, VPP
+ * `os-odl_l2-fdio-noha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-odl_l2-fdio-noha/index.html>`_:
+  OpenStack, OpenDaylight (for Layer 2 networking control),
+  HoneyComb, VPP
+ * `os-odl_l3-fdio-noha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-odl_l3-fdio-noha/index.html>`_:
+  OpenStack, OpenDaylight (for Layer 2 and Layer 3 networking control),
+  HoneyComb, VPP
+ * `os-odl_l3-fdio-ha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-odl_l3-fdio-ha/index.html>`_:
+  OpenStack (in a high-availability setup), OpenDaylight (for Layer 2 and Layer 3 networking control in clustered mode),
+  HoneyComb, VPP
+
+
+All of the scenarios are installed using the APEX installer.
+
+
+FastDataStacks Scenarios in Danube 3.0
+======================================
+
+In release Danube 3.0, FastDataStacks releases the following scenarios:
 
  * `os-nosdn-fdio-noha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-nosdn-fdio-noha/index.html>`_:
   OpenStack (with Neutron networking-vpp mechanism driver), VPP
@@ -297,4 +342,33 @@ and `APEX 445 <https://jira.opnfv.org/browse/APEX-445>`_ for details.
   Tempest failures in l3 scenarios
 * `FDS-334 <https://jira.opnfv.org/browse/FDS-334>`_:
   Refstack failures in l3 scenarios
+
+Scenario os-nosdn-fdio-noha known issues in Danube 3.0
+------------------------------------------------------
+
+None
+
+Scenario os-odl_l2-fdio-noha known issues in Danube 3.0
+-------------------------------------------------------
+
+* `APEX-471 <https://jira.opnfv.org/browse/APEX-471>`_:
+  ODL doesn't mount, manual mounting might be needed
+
+Scenario os-odl_l2-fdio-ha known issues in Danube 3.0
+-----------------------------------------------------
+
+* `APEX-471 <https://jira.opnfv.org/browse/APEX-471>`_:
+  ODL doesn't mount, manual mounting might be needed
+
+Scenario os-odl_l3-fdio-noha known issues in Danube 3.0
+-------------------------------------------------------
+
+* `APEX-471 <https://jira.opnfv.org/browse/APEX-471>`_:
+  ODL doesn't mount, manual mounting might be needed
+
+Scenario os-odl_l3-fdio-ha known issues in Danube 3.0
+-----------------------------------------------------
+
+* `APEX-471 <https://jira.opnfv.org/browse/APEX-471>`_:
+  ODL doesn't mount, manual mounting might be needed
 
