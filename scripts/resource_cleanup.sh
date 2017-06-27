@@ -382,7 +382,7 @@ else
         ODL_PORT=$(awk '/<Call/{f=1} f{print; if (/<\/Call>/) exit}' $ODL_DIR/etc/jetty.xml | \
             grep jetty.port | grep -Eo [0-9]+)
         echo "$HOSTNAME: waiting for odl to start"
-        for i in $(seq 1 60)
+        for i in $(seq 1 120)
         do
             sleep 1
             ODL_RESPONSE=$(curl -s -XGET -u $odl_username:$odl_password \
@@ -390,12 +390,12 @@ else
                 | python -m json.tool 2> /dev/null)
             if [[ $? -ne 0 || $(echo $ODL_RESPONSE | grep -c error) -ne 0 ]]
             then
-                if [[ $i == 60 ]]
+                if [[ $i == 120 ]]
                 then
                     echo "$HOSTNAME: odl didn't respond to rest calls after $i seconds, stopping trying"
                 elif [[ $i == *"0" ]]
                 then
-                    echo "$HOSTNAME: odl didn't respond to rest calls after $i seconds, waiting up to 60 seconds"
+                    echo "$HOSTNAME: odl didn't respond to rest calls after $i seconds, waiting up to 120 seconds"
                 fi
             else
                 echo "$HOSTNAME: odl is responding to rest calls"
