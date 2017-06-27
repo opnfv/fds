@@ -38,11 +38,13 @@ Create sec rules
     Wait Until Keyword Succeeds  3x  3s  create security rule  ${SEC_GR_SERVER}  ingress  ipv4  proto=icmp
 
 Create port for VM1
-    ${result} =     Create port with ip     ${port1_name}   ${vm1_address}
+    ${security_groups} =    Create List             ${SEC_GR_SERVER}
+    ${result} =     Create port with ip     ${port1_name}   ${vm1_address}   ${security_groups}
     Set Suite Variable  ${port1_id}     ${result}
 
 Create port for VM2
-    ${result} =     Create port with ip     ${port2_name}   ${vm2_address}
+    ${security_groups} =    Create List             ${SEC_GR_CLIENT}
+    ${result} =     Create port with ip     ${port2_name}   ${vm2_address}   ${security_groups}
     Set Suite Variable  ${port2_id}     ${result}
 
 Create VM1
@@ -56,7 +58,7 @@ Wait for VM1 to be active
 
 Create VM2
     ${port_ids} =   Create List     ${port2_id}
-    ${result} =     Create vm       ${vm2_name}     ${port_ids}    flavor=${flavor_to_use}     userdata=${userdata2}
+    ${result} =     Create vm       ${vm2_name}     ${port_ids}    userdata=${userdata2}
     Set Suite Variable  ${vm2_id}   ${result}
 
 Wait for VM2 to be active

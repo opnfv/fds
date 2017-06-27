@@ -72,8 +72,8 @@ Create security group rules
     log many    &{response}
 
 Create port with ip
-    [Arguments]     ${port_name}    ${ip_address}
-    &{response} =   create port     ${port_name}    ${network_id}   ${subnet_id}    ${ip_address}
+    [Arguments]     ${port_name}    ${ip_address}   ${security_groups}
+    &{response} =   create port     ${port_name}    ${network_id}   ${subnet_id}    ${ip_address}   ${security_groups}
     log many    &{response}
     log         ${response.port['id']}
     [Return]    ${response.port['id']}
