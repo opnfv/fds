@@ -7,7 +7,7 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 ##############################################################################
 
-from keystoneauth1 import loading
+from keystoneauth1.identity import v2, v3
 from keystoneauth1 import session
 from glanceclient import client as glance
 from neutronclient.v2_0 import client as neutron
@@ -22,19 +22,25 @@ import subprocess
 
 class FDSLibrary():
     def __init__(self):
-        auth_obj = loading.get_plugin_loader('password').load_from_options(auth_url=os.getenv('OS_AUTH_URL'),
-                                                                           username=os.getenv('OS_USERNAME'),
-                                                                           password=os.getenv('OS_PASSWORD'),
-                                                                           project_id=os.getenv('OS_PROJECT_ID'))
+        if os.getenv('OS_IDENTITY_API_VERSION') == '3':
+            auth = v3.Password(auth_url=os.getenv('OS_AUTH_URL'),
+                               username=os.getenv('OS_USERNAME'),
+                               password=os.getenv('OS_PASSWORD'),
+                               project_id=os.getenv('OS_PROJECT_ID'),
+                               user_domain_name=os.getenv('OS_USER_DOMAIN_NAME'))
+        else:
+            auth = v2.Password(username=os.getenv('OS_USERNAME'),
+                               password=os.getenv('OS_PASSWORD'),
+                               tenant_name=os.getenv('OS_TENANT_NAME'),
+                               auth_url=os.getenv('OS_AUTH_URL'))
+
+        sess = session.Session(auth=auth)
         logger.debug("Initializing glance client.")
-        self.glance_client = glance.Client('2', session=session.Session(auth=auth_obj))
+        self.glance_client = glance.Client('2', session=sess)
         logger.debug("Initializing neutron client.")
-        self.neutron_client = neutron.Client(username=os.getenv('OS_USERNAME'),
-                                             password=os.getenv('OS_PASSWORD'),
-                                             tenant_name=os.getenv('OS_TENANT_NAME'),
-                                             auth_url=os.getenv('OS_AUTH_URL'))
+        self.neutron_client = neutron.Client(session=sess)
         logger.debug("Initializing nova client.")
-        self.nova_client = nova.Client('2', session=session.Session(auth=auth_obj))
+        self.nova_client = nova.Client('2', session=sess)
 
     def check_flavor_exists(self):
         flavor_names = [x for x in self.nova_client.flavors.list(min_ram=760)]
@@ -104,17 +110,22 @@ class FDSLibrary():
         response = self.nova_client.servers.create(name=name, image=image.id, flavor=flavor.id,
                                                    security_groups=security_groups, nics=nics,
                                                    userdata=userdata)
-        for key in dir(response):
-            print key, getattr(response, key)
         return response
 
     def format_string(self, string, substitute):
         return string.format(substitute)
 
-    def check_server_console(self, vm_id, string):
+    def _check_vm_is_active(self, vm_id):
         vm_obj = self.nova_client.servers.get(vm_id)
-        timeout = 0
-        while timeout < 100:
+        if getattr(vm_obj, 'OS-EXT-STS:vm_state', None) != 'active':
+            raise Exception("VM with id '{}' is not active".format(vm_id))
+
+    def check_server_console(self, vm_id, string, timeout=300):
+        self._check_vm_is_active(vm_id)
+        vm_obj = self.nova_client.servers.get(vm_id)
+        start = datetime.datetime.now()
+        delta = datetime.timedelta(seconds=timeout)
+        while datetime.datetime.now() - start < delta:
             console_out = vm_obj.get_console_output()
             print "console output is: '{}'".format(console_out[-200:])
             failed_to_read_metadata = 'failed to read iid from metadata'
@@ -125,7 +136,6 @@ class FDSLibrary():
             elif failed_to_read_metadata in console_out:
                 print failed_to_read_metadata
                 return False
-            timeout += 1
             time.sleep(5)
         return False
 
@@ -167,12 +177,15 @@ class FDSLibrary():
             while datetime.datetime.now() - start < delta and self._states_are_not_equal(current_state, status):
                 time.sleep(1)
                 vm_obj = self.nova_client.servers.get(vm_id)
-                current_state = getattr(vm_obj, 'OS-EXT-STS:vm_state', None)
                 print "Found state '{}' while looking for state '{}'".format(current_state, status)
+                current_state = getattr(vm_obj, 'OS-EXT-STS:vm_state', None)
+                if current_state == 'error':
+                    raise Exception("Vm with id '{}' is in state '{}' after {} seconds"
+                        "".format(vm_id, current_state, (datetime.datetime.now() - start).seconds))
 
             if self._states_are_not_equal(current_state, status):
                 raise Exception("Vm with id '{}' is in state '{}' after timeout of {} seconds"
-                                "".format(vm_id, getattr(vm_obj, 'OS-EXT-STS:vm_state'), timeout))
+                                "".format(vm_id, current_state, timeout))
         except NotFound as e:
             if status is not None:
                 raise e
