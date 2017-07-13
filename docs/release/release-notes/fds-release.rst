@@ -346,29 +346,66 @@ and `APEX 445 <https://jira.opnfv.org/browse/APEX-445>`_ for details.
 Scenario os-nosdn-fdio-noha known issues in Danube 3.0
 ------------------------------------------------------
 
-None
+* `FDS-405 <https://jira.opnfv.org/browse/FDS-405>`_:
+  vlan-strip-offload parameter needs to be set to off
+* `FDS-401 <https://jira.opnfv.org/browse/FDS-401>`_:
+  SimpleHealthCheck fails in snaps_smoke
+* `FDS-156 <https://jira.opnfv.org/browse/FDS-156>`_:
+  Race conditions for network-vif-plugged notification
+* `FDS-160 <https://jira.opnfv.org/browse/FDS-160>`_:
+  Vlan fix on controller
+
+Scenario os-nosdn-fdio-ha known issues in Danube 3.0
+------------------------------------------------------
+
+* `FDS-405 <https://jira.opnfv.org/browse/FDS-405>`_:
+  vlan-strip-offload parameter needs to be set to off
+* `FDS-401 <https://jira.opnfv.org/browse/FDS-401>`_:
+  SimpleHealthCheck fails in snaps_smoke
+* `FDS-156 <https://jira.opnfv.org/browse/FDS-156>`_:
+  Race conditions for network-vif-plugged notification
+* `FDS-160 <https://jira.opnfv.org/browse/FDS-160>`_:
+  Vlan fix on controller
+* `FDS-400 <https://jira.opnfv.org/browse/FDS-400>`_:
+  RACE condition between VPP ML2 agent and tempest code
+* `FDS-399 <https://jira.opnfv.org/browse/FDS-399>`_:
+  Neutron ports are not marked ACTIVE
+* `FDS-371 <https://jira.opnfv.org/browse/FDS-371>`_:
+  Tempest_full_parallel failures due to DBDeadlock error
+* `APEX-468 <https://jira.opnfv.org/browse/APEX-468>`_:
+  Mariadb/mysqld fails to start post a reboot
+* `APEX-469 <https://jira.opnfv.org/browse/APEX-469>`_:
+  Undercloud iptables rules are messed up post a power outage
+* `FUNCTEST-841 <https://jira.opnfv.org/browse/FUNCTEST-841>`_:
+  Cloudify_ims testcase keeps timing out
+* `ORCEHSTRA-13 <https://jira.opnfv.org/browse/ORCEHSTRA-13>`_:
+  Internal Server Error/java.lang.OutOfMemoryError: Java heap space
 
 Scenario os-odl_l2-fdio-noha known issues in Danube 3.0
 -------------------------------------------------------
 
-* `APEX-471 <https://jira.opnfv.org/browse/APEX-471>`_:
-  ODL doesn't mount, manual mounting might be needed
+* `FDS-397 <https://jira.opnfv.org/browse/FDS-397>`_:
+  Metadata rules are not configured
 
 Scenario os-odl_l2-fdio-ha known issues in Danube 3.0
 -----------------------------------------------------
 
-* `APEX-471 <https://jira.opnfv.org/browse/APEX-471>`_:
-  ODL doesn't mount, manual mounting might be needed
+* `FDS-397 <https://jira.opnfv.org/browse/FDS-397>`_:
+  Metadata rules are not configured
+* `FDS-404 <https://jira.opnfv.org/browse/FDS-404>`_:
+  Cluster in HA scenarios sometimes breaks down
 
 Scenario os-odl_l3-fdio-noha known issues in Danube 3.0
 -------------------------------------------------------
 
-* `APEX-471 <https://jira.opnfv.org/browse/APEX-471>`_:
-  ODL doesn't mount, manual mounting might be needed
+* `FDS-397 <https://jira.opnfv.org/browse/FDS-397>`_:
+  Metadata rules are not configured
 
 Scenario os-odl_l3-fdio-ha known issues in Danube 3.0
 -----------------------------------------------------
 
-* `APEX-471 <https://jira.opnfv.org/browse/APEX-471>`_:
-  ODL doesn't mount, manual mounting might be needed
+* `FDS-397 <https://jira.opnfv.org/browse/FDS-397>`_:
+  Metadata rules are not configured
+* `FDS-404 <https://jira.opnfv.org/browse/FDS-404>`_:
+  Cluster in HA scenarios sometimes breaks down
 
