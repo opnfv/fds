@@ -86,17 +86,19 @@ class FDSLibrary():
         response = self.neutron_client.create_subnet(body=body)
         return response
 
-    def create_port(self, name, net_id, subnet_id, ip_address, security_groups=None):
+    def create_port(self, name, net_id, subnet_id=None, ip_address=None, security_groups=None):
         body = {'port': {
             'name': name,
             'network_id': net_id,
-            'fixed_ips': [
-                {
-                    'subnet_id': subnet_id,
-                    'ip_address': ip_address
-                }
-            ]
         }}
+        if subnet_id is not None:
+            body['port']['fixed_ips'] = [
+                    {
+                        'subnet_id': subnet_id,
+                        'ip_address': ip_address
+                    }
+                ]
+
         if security_groups is not None:
             # this is a list
             body['port']['security_groups'] = security_groups
