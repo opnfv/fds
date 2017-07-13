@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa4ed85_09ada488",
+        "filename": "docs/release/release-notes/fds-release.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 6733
+      },
+      "writtenOn": "2017-07-13T15:55:33Z",
+      "side": 1,
+      "message": "should be 2017-07-13",
+      "revId": "78c6fd702cd3dcb72e3af02a507406aec9618fe8",
+      "serverId": "bbac25d2-bf60-4904-9ba8-a72fc000d6c5",
+      "unresolved": false
+    }
+  ]
+}
