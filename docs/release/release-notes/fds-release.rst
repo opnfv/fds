@@ -14,7 +14,7 @@ You should have received a copy of the license along with this.
 If not, see <http://creativecommons.org/licenses/by/4.0/>.
 
 ===============================================
-OPNFV Danube1.0 release note for FastDataStacks
+OPNFV Danube3.0 release note for FastDataStacks
 ===============================================
 
 Abstract
@@ -36,7 +36,7 @@ Version history
 | 2017-05-02 | 2.0.0    | Frank Brockners  | FastDataStacks for Danube |
 |            |          | (Cisco)          | 2.0 release               |
 +------------+----------+------------------+---------------------------+
-| 2017-06-07 | 3.0.0    | Juraj Linkes     | FastDataStacks for Danube |
+| 2017-07-13 | 3.0.0    | Juraj Linkes     | FastDataStacks for Danube |
 |            |          | (Cisco)          | 3.0 release               |
 +------------+----------+------------------+---------------------------+
 
@@ -133,7 +133,7 @@ Release Data
 | **Release designation**              | Danube enhancements release          |
 |                                      |                                      |
 +--------------------------------------+--------------------------------------+
-| **Release date**                     | Jun 8th    2017                      |
+| **Release date**                     | Jul 14th    2017                     |
 |                                      |                                      |
 +--------------------------------------+--------------------------------------+
 | **Purpose of the delivery**          | Danube enhancements release          |
@@ -192,19 +192,26 @@ FastDataStacks Scenarios in Danube 3.0
 In release Danube 3.0, FastDataStacks releases the following scenarios:
 
  * `os-nosdn-fdio-noha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-nosdn-fdio-noha/index.html>`_:
-  OpenStack (with Neutron networking-vpp mechanism driver), VPP
+  OpenStack (with Neutron networking-vpp mechanism driver),
+  VPP
+ * `os-nosdn-fdio-ha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-nosdn-fdio-ha/index.html>`_:
+  OpenStack (in a high-availability setup, with Neutron networking-vpp mechanism driver),
+  VPP
  * `os-odl_l2-fdio-ha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-odl_l2-fdio-ha/index.html>`_:
   OpenStack (in a high-availability setup),
-  OpenDaylight (for Layer 2 networking control),
+  OpenDaylight (for Layer 2 networking control in clustered mode),
   HoneyComb, VPP
  * `os-odl_l2-fdio-noha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-odl_l2-fdio-noha/index.html>`_:
-  OpenStack, OpenDaylight (for Layer 2 networking control),
+  OpenStack,
+  OpenDaylight (for Layer 2 networking control),
   HoneyComb, VPP
  * `os-odl_l3-fdio-noha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-odl_l3-fdio-noha/index.html>`_:
-  OpenStack, OpenDaylight (for Layer 2 and Layer 3 networking control),
+  OpenStack,
+  OpenDaylight (for Layer 2 and Layer 3 networking control),
   HoneyComb, VPP
  * `os-odl_l3-fdio-ha <http://docs.opnfv.org/en/stable-danube/submodules/fds/docs/scenarios/os-odl_l3-fdio-ha/index.html>`_:
-  OpenStack (in a high-availability setup), OpenDaylight (for Layer 2 and Layer 3 networking control in clustered mode),
+  OpenStack (in a high-availability setup),
+  OpenDaylight (for Layer 2 and Layer 3 networking control in clustered mode),
   HoneyComb, VPP
 
 
@@ -346,29 +353,66 @@ and `APEX 445 <https://jira.opnfv.org/browse/APEX-445>`_ for details.
 Scenario os-nosdn-fdio-noha known issues in Danube 3.0
 ------------------------------------------------------
 
-None
+* `FDS-405 <https://jira.opnfv.org/browse/FDS-405>`_:
+  vlan-strip-offload parameter needs to be set to off
+* `FDS-401 <https://jira.opnfv.org/browse/FDS-401>`_:
+  SimpleHealthCheck fails in snaps_smoke
+* `FDS-156 <https://jira.opnfv.org/browse/FDS-156>`_:
+  Race conditions for network-vif-plugged notification
+* `FDS-160 <https://jira.opnfv.org/browse/FDS-160>`_:
+  Vlan fix on controller
+
+Scenario os-nosdn-fdio-ha known issues in Danube 3.0
+------------------------------------------------------
+
+* `FDS-405 <https://jira.opnfv.org/browse/FDS-405>`_:
+  vlan-strip-offload parameter needs to be set to off
+* `FDS-401 <https://jira.opnfv.org/browse/FDS-401>`_:
+  SimpleHealthCheck fails in snaps_smoke
+* `FDS-156 <https://jira.opnfv.org/browse/FDS-156>`_:
+  Race conditions for network-vif-plugged notification
+* `FDS-160 <https://jira.opnfv.org/browse/FDS-160>`_:
+  Vlan fix on controller
+* `FDS-400 <https://jira.opnfv.org/browse/FDS-400>`_:
+  RACE condition between VPP ML2 agent and tempest code
+* `FDS-399 <https://jira.opnfv.org/browse/FDS-399>`_:
+  Neutron ports are not marked ACTIVE
+* `FDS-371 <https://jira.opnfv.org/browse/FDS-371>`_:
+  Tempest_full_parallel failures due to DBDeadlock error
+* `APEX-468 <https://jira.opnfv.org/browse/APEX-468>`_:
+  Mariadb/mysqld fails to start post a reboot
+* `APEX-469 <https://jira.opnfv.org/browse/APEX-469>`_:
+  Undercloud iptables rules are messed up post a power outage
+* `FUNCTEST-841 <https://jira.opnfv.org/browse/FUNCTEST-841>`_:
+  Cloudify_ims testcase keeps timing out
+* `ORCEHSTRA-13 <https://jira.opnfv.org/browse/ORCEHSTRA-13>`_:
+  Internal Server Error/java.lang.OutOfMemoryError: Java heap space
 
 Scenario os-odl_l2-fdio-noha known issues in Danube 3.0
 -------------------------------------------------------
 
-* `APEX-471 <https://jira.opnfv.org/browse/APEX-471>`_:
-  ODL doesn't mount, manual mounting might be needed
+* `FDS-397 <https://jira.opnfv.org/browse/FDS-397>`_:
+  Metadata rules are not configured
 
 Scenario os-odl_l2-fdio-ha known issues in Danube 3.0
 -----------------------------------------------------
 
-* `APEX-471 <https://jira.opnfv.org/browse/APEX-471>`_:
-  ODL doesn't mount, manual mounting might be needed
+* `FDS-397 <https://jira.opnfv.org/browse/FDS-397>`_:
+  Metadata rules are not configured
+* `FDS-404 <https://jira.opnfv.org/browse/FDS-404>`_:
+  Cluster in HA scenarios sometimes breaks down
 
 Scenario os-odl_l3-fdio-noha known issues in Danube 3.0
 -------------------------------------------------------
 
-* `APEX-471 <https://jira.opnfv.org/browse/APEX-471>`_:
-  ODL doesn't mount, manual mounting might be needed
+* `FDS-397 <https://jira.opnfv.org/browse/FDS-397>`_:
+  Metadata rules are not configured
 
 Scenario os-odl_l3-fdio-ha known issues in Danube 3.0
 -----------------------------------------------------
 
-* `APEX-471 <https://jira.opnfv.org/browse/APEX-471>`_:
-  ODL doesn't mount, manual mounting might be needed
+* `FDS-397 <https://jira.opnfv.org/browse/FDS-397>`_:
+  Metadata rules are not configured
+* `FDS-404 <https://jira.opnfv.org/browse/FDS-404>`_:
+  Cluster in HA scenarios sometimes breaks down
 
