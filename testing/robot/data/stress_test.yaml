@@ -1,0 +1,25 @@
+# one of odl_l3, odl_l2, nosdn; if not present, will try to get it from env variable DEPLOY_SCENARIO
+#scenario='odl_l3'
+
+image: cirros-0.3.4
+flavor: m1.tiny
+log_level: DEBUG  # standard python levels (DEBUG, INFO, WARNING, ERROR, CRITICAL), defaults to INFO if not set
+
+openstack:
+  ssh_user: root
+  ssh_key_path: /root/.ssh/id_rsa  # this is private key in OpenSSH format
+                                   # the user that's running the test needs proper access rights to this key
+  node_ips:       # list of openstack host ips
+    - 192.0.2.8
+    - 192.0.2.9
+    - 192.0.2.4
+    - 192.0.2.7
+    - 192.0.2.10
+
+odl:
+  rest_username: admin
+  rest_password: admin # admin/admin is the default
+  cluster_rest_ip: 192.0.2.6  # if not present, will try to get it from env variable SDN_CONTROLLER_IP
+  cluster_rest_port: 8081
+
+#nosdn:

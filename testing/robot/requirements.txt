@@ -1,2 +1,4 @@
 python-openstackclient
 python-neutronclient
+paramiko
+PyYAML
