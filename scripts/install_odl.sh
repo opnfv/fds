@@ -7,8 +7,7 @@ INSTALL_DIR=/opt
 ODL_DIR=$INSTALL_DIR/opendaylight
 ODL_TGZ_NAME=$1
 cp $ODL_DIR/etc/jetty.xml $INSTALL_DIR
-cp $ODL_DIR/etc/org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.startup.cfg $INSTALL_DIR
-cp $ODL_DIR/etc/org.opendaylight.groupbasedpolicy.renderer.vpp.startup.cfg $INSTALL_DIR
+cp $ODL_DIR/etc/org.opendaylight.groupbasedpolicy.* $INSTALL_DIR
 rm -rf $ODL_DIR
 #mv opendaylight orig_opendaylight
 ODL_DEFAULT_DIR_NAME=$(tar tf $ODL_TGZ_NAME | head -n1 | cut -d "/" -f 1)
@@ -19,8 +18,7 @@ mv $INSTALL_DIR/$ODL_DEFAULT_DIR_NAME $INSTALL_DIR/opendaylight
 #CHANGE PORT AND CONFIGURE:
 echo "$HOSTNAME: configuring odl"
 cp $INSTALL_DIR/jetty.xml $ODL_DIR/etc/
-cp $INSTALL_DIR/org.opendaylight.groupbasedpolicy.neutron.vpp.mapper.startup.cfg $ODL_DIR/etc/
-cp $INSTALL_DIR/org.opendaylight.groupbasedpolicy.renderer.vpp.startup.cfg $ODL_DIR/etc/
+cp $INSTALL_DIR/org.opendaylight.groupbasedpolicy.* $ODL_DIR/etc/
 
 #CONFIGURE LOGGING:
 sed -i 's/log4j.appender.out.maxFileSize=.*/log4j.appender.out.maxFileSize=100MB/' $ODL_DIR/etc/org.ops4j.pax.logging.cfg

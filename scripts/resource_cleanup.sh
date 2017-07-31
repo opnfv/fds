@@ -119,14 +119,14 @@ clean_from_jumphost() {
             # if controller node and controller queue exist, execute on that node
             echo "Cleaning $NODE"
             ssh -oStrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$NODE \
-                "$overcloud_script_loc/$0 -n controller $CONTROLLER_QUEUE" &
+                "$overcloud_script_loc/$(basename $0) -n controller $CONTROLLER_QUEUE" &
         fi
         if [[ $NODE == *"compute"* && $COMPUTE_QUEUE ]]
         then
             # if compute node and compute queue exist, execute on that node
             echo "Cleaning $NODE"
             ssh -oStrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$NODE \
-                "$overcloud_script_loc/$0 -n compute $COMPUTE_QUEUE" &
+                "$overcloud_script_loc/$(basename $0) -n compute $COMPUTE_QUEUE" &
         fi
     done
 
