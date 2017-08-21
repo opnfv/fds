@@ -1,3 +1,11 @@
+##############################################################################
+# Copyright (c) 2017 Juraj Linkes (Cisco) and others.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
 #!/bin/bash
 SCRIPT_DIR=$(dirname $0)
 . $SCRIPT_DIR/lib.sh
@@ -5,12 +13,16 @@ SCRIPT_DIR=$(dirname $0)
 NODE_TYPES="compute controller"
 RESOURCE_TYPES="openstack opendaylight fdio"
 HOSTNAME=$(hostname)
+ODL_TIMEOUT=120
+HC_TIMEOUT=30
 
 display_arguments() {
     echo "Available arguments:"
     echo "  -n|--node-type with valid values $NODE_TYPES"
     echo "  -e|--exclude with valid values $RESOURCE_TYPES"
     echo "  -w|--whitelist with valid values $RESOURCE_TYPES"
+    echo "  -ot|--odl-timeout an interger"
+    echo "  -ft|--fdio-timeout an interger"
     echo "  -e and -o may be repeated and are mutually exclusive"
     exit 1
 }
@@ -119,14 +131,14 @@ clean_from_jumphost() {
             # if controller node and controller queue exist, execute on that node
             echo "Cleaning $NODE"
             ssh -oStrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$NODE \
-                "$overcloud_script_loc/$(basename $0) -n controller $CONTROLLER_QUEUE" &
+                "$overcloud_script_loc/$(basename $0) -n controller $CONTROLLER_QUEUE" -ot $ODL_TIMEOUT -ft $HC_TIMEOUT &
         fi
         if [[ $NODE == *"compute"* && $COMPUTE_QUEUE ]]
         then
             # if compute node and compute queue exist, execute on that node
             echo "Cleaning $NODE"
             ssh -oStrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$NODE \
-                "$overcloud_script_loc/$(basename $0) -n compute $COMPUTE_QUEUE" &
+                "$overcloud_script_loc/$(basename $0) -n compute $COMPUTE_QUEUE" -ot $ODL_TIMEOUT -ft $HC_TIMEOUT &
         fi
     done
 
@@ -239,9 +251,9 @@ clean_overcloud_resource() {
             sleep 1
             service honeycomb start &> /dev/null
             echo "$HOSTNAME: starting honeycomb"
-            HC_IP=$(grep restconf-binding-address /opt/honeycomb/config/honeycomb.json | grep -Eo "$IPV4_REGEX")
-            HC_PORT=$(grep restconf-port /opt/honeycomb/config/honeycomb.json | grep -Eo [0-9]+)
-            for i in $(seq 1 30)
+            HC_IP=$(grep -r restconf-binding-address /opt/honeycomb/config/ | grep -Eo "$IPV4_REGEX")
+            HC_PORT=$(grep -r restconf-port /opt/honeycomb/config/ | grep -Eo [0-9]+)
+            for i in $(seq 1 $HC_TIMEOUT)
             do
                 sleep 1
                 HC_RESPONSE=$(curl -s -XGET -u $hc_username:$hc_password \
@@ -249,12 +261,12 @@ clean_overcloud_resource() {
                     | python -m json.tool 2> /dev/null)
                 if [[ $? -ne 0 || $(echo $HC_RESPONSE | grep -c error) -ne 0 ]]
                 then
-                    if [[ $i == 30 ]]
+                    if [[ $i == $HC_TIMEOUT ]]
                     then
                         echo "$HOSTNAME: honecomb didn't respond to rest calls after $i seconds, stopping trying"
                     elif [[ $i == *"0" ]]
                     then
-                        echo "$HOSTNAME: honeycomb didn't respond to rest calls after $i seconds, waiting up to 30 seconds"
+                        echo "$HOSTNAME: honeycomb didn't respond to rest calls after $i seconds, waiting up to $HC_TIMEOUT seconds"
                     fi
                 else
                     echo "$HOSTNAME: honeycomb is responding to rest calls"
@@ -324,6 +336,14 @@ do
             fi
             shift
             ;;
+        -ot|--odl-timeout)
+            ODL_TIMEOUT=$2
+            shift
+            ;;
+        -ft|--fdio-timeout)
+            FDIO_TIMEOUT=$2
+            shift
+            ;;
         -h|--help)
             display_arguments
             ;;
@@ -382,7 +402,7 @@ else
         ODL_PORT=$(awk '/<Call/{f=1} f{print; if (/<\/Call>/) exit}' $ODL_DIR/etc/jetty.xml | \
             grep jetty.port | grep -Eo [0-9]+)
         echo "$HOSTNAME: waiting for odl to start"
-        for i in $(seq 1 120)
+        for i in $(seq 1 $ODL_TIMEOUT)
         do
             sleep 1
             ODL_RESPONSE=$(curl -s -XGET -u $odl_username:$odl_password \
@@ -390,12 +410,12 @@ else
                 | python -m json.tool 2> /dev/null)
             if [[ $? -ne 0 || $(echo $ODL_RESPONSE | grep -c error) -ne 0 ]]
             then
-                if [[ $i == 120 ]]
+                if [[ $i == $ODL_TIMEOUT ]]
                 then
                     echo "$HOSTNAME: odl didn't respond to rest calls after $i seconds, stopping trying"
                 elif [[ $i == *"0" ]]
                 then
-                    echo "$HOSTNAME: odl didn't respond to rest calls after $i seconds, waiting up to 120 seconds"
+                    echo "$HOSTNAME: odl didn't respond to rest calls after $i seconds, waiting up to $ODL_TIMEOUT seconds"
                 fi
             else
                 echo "$HOSTNAME: odl is responding to rest calls"

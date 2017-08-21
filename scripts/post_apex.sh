@@ -79,7 +79,7 @@ then
     if [[ ! -f $image_loc ]]
     then
         echo "Downloading cirros image to $image_loc"
-        wget http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img -O $image_loc
+        wget https://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img -O $image_loc
     fi
     openstack image create --disk-format qcow2 --container-format bare --public --property hw_mem_page_size=large \
         --file $image_loc cirros-0.3.4
