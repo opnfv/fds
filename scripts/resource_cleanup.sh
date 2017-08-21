@@ -1,3 +1,11 @@
+##############################################################################
+# Copyright (c) 2017 Juraj Linkes (Cisco) and others.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
 #!/bin/bash
 SCRIPT_DIR=$(dirname $0)
 . $SCRIPT_DIR/lib.sh
@@ -239,8 +247,8 @@ clean_overcloud_resource() {
             sleep 1
             service honeycomb start &> /dev/null
             echo "$HOSTNAME: starting honeycomb"
-            HC_IP=$(grep restconf-binding-address /opt/honeycomb/config/honeycomb.json | grep -Eo "$IPV4_REGEX")
-            HC_PORT=$(grep restconf-port /opt/honeycomb/config/honeycomb.json | grep -Eo [0-9]+)
+            HC_IP=$(grep -r restconf-binding-address /opt/honeycomb/config/ | grep -Eo "$IPV4_REGEX")
+            HC_PORT=$(grep -r restconf-port /opt/honeycomb/config/ | grep -Eo [0-9]+)
             for i in $(seq 1 30)
             do
                 sleep 1
