@@ -1,3 +1,11 @@
+##############################################################################
+# Copyright (c) 2017 Juraj Linkes (Cisco) and others.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+##############################################################################
 #!/bin/bash
 SCRIPT_DIR=$(dirname "$0")
 . $SCRIPT_DIR/lib.sh
@@ -79,7 +87,7 @@ then
     if [[ ! -f $image_loc ]]
     then
         echo "Downloading cirros image to $image_loc"
-        wget http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img -O $image_loc
+        wget https://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img -O $image_loc
     fi
     openstack image create --disk-format qcow2 --container-format bare --public --property hw_mem_page_size=large \
         --file $image_loc cirros-0.3.4
