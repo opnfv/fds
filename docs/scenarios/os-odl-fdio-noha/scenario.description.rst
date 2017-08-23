@@ -2,14 +2,14 @@
 .. This work is licensed under a Creative Commons Attribution 4.0 International License.
 .. http://creativecommons.org/licenses/by/4.0
 
-Scenario: "OpenStack - OpenDaylight (Layer 3) - FD.io"
+Scenario: "OpenStack - OpenDaylight - FD.io"
 ======================================================
 
-Scenario: apex-os-odl_l3-fdio-noha
+Scenario: apex-os-odl-fdio-noha
 
-"apex-os-odl_l3-fdio-noha" is a scenario developed as part of the
+"apex-os-odl-fdio-noha" is a scenario developed as part of the
 FastDataStacks OPNFV project. The main components of the
-"apex-os-odl_l3-fdio-noha" scenario are:
+"apex-os-odl-fdio-noha" scenario are:
 
  - APEX (TripleO) installer (please also see APEX installer documentation)
  - Openstack (in non-HA configuration)
@@ -28,6 +28,7 @@ network topology.
 
 A solution stack is only as good as its foundation. Key foundational assets for
 NFV infrastructure are
+
   * The virtual forwarder: The virtual forwarder needs to be a feature rich,
     high performance, highly scale virtual switch-router. It needs to leverage
     hardware accelerators when available and run in user space.
@@ -42,6 +43,7 @@ NFV infrastructure are
 In order to meet the desired qualities of an NFV infrastructure, the
 following components were chosen for the "Openstack - OpenDaylight - FD.io"
 scenario:
+
   * FD.io Vector Packet Processor (VPP) - a highly scalable,
     high performance, extensible virtual forwarder
   * OpenDaylight Controller - an extensible controller platform which
@@ -68,7 +70,7 @@ transport use cases are realized:
   * NFV instances with VPP data-plane forwarding using a VXLAN overlay
     transport network
 
-A deployment of the "apex-os-odl_l3-fdio-noha" scenario consists of 4 or more
+A deployment of the "apex-os-odl-fdio-noha" scenario consists of 4 or more
 servers:
 
   * 1 Jumphost hosting the APEX installer - running the Undercloud
@@ -102,7 +104,7 @@ and east-west traffic filtering for security purposes ("security groups").
 Features of the scenario
 ------------------------
 
-Main features of the "apex-os-odl_l3-fdio-noha" scenario:
+Main features of the "apex-os-odl-fdio-noha" scenario:
 
   * Automated installation using the APEX installer
   * Fast and scalable tenant networking using FD.io/VPP as forwarder
@@ -116,17 +118,13 @@ Main features of the "apex-os-odl_l3-fdio-noha" scenario:
 Scenario components and composition
 ===================================
 
-The apex-os-odl_l3-fdio-noha scenario combines components from three key open
+The apex-os-odl-fdio-noha scenario combines components from three key open
 source projects: OpenStack, OpenDaylight, and Fast Data (FD.io). The key
-components that realize the apex-os-odl_l3-fdio-noha scenario and which differ
+components that realize the apex-os-odl-fdio-noha scenario and which differ
 from a regular, OVS-based scenario, are the OpenStack ML2 OpenDaylight plugin,
 OpenDaylight Neutron Northbound, OpenDaylight Group Based Policy, OpenDaylight
 Virtual Bridge Domain Manager, FD.io Honeycomb management agent and FD.io
 Vector Packet Processor (VPP).
-
-Note that the key components of the OpenDaylight based scenarios of
-FastDataStacks are the same. The Layer 2 scenario "apex-os-odl_l2-fdio-noha"
-and the Layer 3 scenario "apex-os-odl_l3-fdio-noha" share the same components.
 
 Here's a more detailed list of the individual software components involved:
 
@@ -212,7 +210,7 @@ Renderer and drives VPP configuration using VPP's local Java APIs.
 Scenario Configuration
 ======================
 
-To enable the "apex-os-odl_l3-fdio-noha" scenario check the appropriate
+To enable the "apex-os-odl-fdio-noha" scenario check the appropriate
 settings in the APEX configuration files. Those are typically found in
 /etc/opnfv-apex.
 
