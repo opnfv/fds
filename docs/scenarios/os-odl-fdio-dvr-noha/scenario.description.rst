@@ -167,15 +167,30 @@ Policy States, for any errors in the application of a rendered configuration.
 **GBP VPP Renderer Interface Manager**: Listens to VPP endpoints in the
 Config DataStore and configures associated interfaces on VPP via HoneyComb.
 
-**LISP Flow Mapping Service**: TODO description
+**LISP Flow Mapping Service**: Stores location information for tenant VMs,
+where the location is the IP address of the compute host running the VM,
+represented as a LISP Routing Locator (RLOC) and the tenant VM address is
+represented as a LISP Endpoint Identifier (EID). The above information is
+stored in an EID-to-RLOC database maintained by the Service, added by the LISP
+VPP component through the LISP Plugin, and is made available for retrieval to
+any compute node. Implements a pub/sub mechanism, where changes in a mapping
+are notified to data forwarders which have previously asked for that
+particular mapping.
 
-**LISP Plugin**: TODO description
+**LISP Plugin**: Implements the LISP control protocol and is responsible for
+receiving/sending UDP LISP control packets on the cloud (compute/controller)
+network, translating them to/from YANG modeled data structures used in
+OpenDaylight, and passing/getting those structures to/from the LISP Flow
+Mapping Service.
 
 **Virtual Packet Processor (VPP)**: The VPP is the
 accelerated data plane forwarding engine relying on vhost user interfaces
 towards Virtual Machines created by the Nova Agent.
 
-**VPP LISP**: TODO description
+**VPP LISP**: Creates traffic driven dynamic tunnels between compute nodes,
+encapsulating tenant VM traffic with VXLAN GPE, using mapping information from
+the LISP Flow Mapping Service. It is also registering mapping information about
+VMs on its host compute (or controller) node to the same service.
 
 **Honeycomb Netconf server**:
 The Honeycomb NETCONF configuration server is responsible for driving
@@ -209,16 +224,21 @@ specific endpoint, and hands the resolution to a device specific renderer,
 which is the VPP renderer in the given case here. VPP renderer turns the
 generic policy into VPP specific configuration. Note that in case the policy
 would need to be applied to a different device, e.g. an OpenVSwitch (OVS),
-then an "OVS Renderer" would be used. VPP Renderer and LISP Flow Mapping
-Service (TODO expand) cooperate to create the actual
-network configuration. VPP Renderer configures the interfaces to the virtual
-machines (VM), i.e. the vhost-user interface in the given case here and LISP
-configured VXLAN tunnels (TODO expand) in the given case here.
+then an "OVS Renderer" would be used.
+
 VPP Renderer communicated with the device using Netconf/Yang.
 All compute and controller nodes run an instance of
 VPP and the VPP-configuration agent "Honeycomb". Honeycomb serves as a
 Netconf/YANG server, receives the configuration commands from VBD and VPP
 Renderer and drives VPP configuration using VPP's local Java APIs.
+
+The network configuration rendered to VPP sets up Proxy-ARP, a destination to
+be used for north-south packet flow, the address of OpenDaylight and for each
+VM, a mapping from the tenant VM address to VPP's own addres (compute node),
+used for east-west traffic. These mappings are periodically sent by VPP LISP
+using the LISP protocol through the LISP Plugin to the LISP Flow Mapping
+Service. Mappings are retrieved on-demand and cached by VPP LISP for VMs on
+other compute nodes, when traffic exists.
 
 To provide a better understanding how the above mentioned components interact
 with each other, the following diagram shows how the example of creating a
@@ -232,12 +252,43 @@ DHCP Packet Flow
 East-West Packet Flow
 =====================
 
+Suppose we have VM1 on compute1 sending traffic to VM2 on compute2. This
+traffic will flow according to the rules in the forwarding information bases
+(FIBs) in the VPP processes on the compute nodes. The L3 destination on the
+packets is the tenant address of VM2, and VM1 does ARP resolution for the
+subnet gateway address for the L2 destination. The Proxy-ARP service from VPP
+on compute1 replies with the MAC address of itself, so it can intercept the
+packet.
+
+Once the packet reaches VPP, it is sent to the VPP LISP component for
+processing (the default action when LISP is enabled), which performs a mapping
+lookup using a Map-Request LISP control packet sent to ODL. At this point, the
+packet is dropped, because no buffering is performed for data plane packets
+without a FIB entry. The Map-Request packet is decoded by the LISP Plugin, and
+the mapping request is passed on to the LISP FLow Mapping Service. Since VM2
+was registering its mapping to ODL when it was created, the lookup is
+successful and returns the address of compute2, where VM2 resides, in a
+Map-Reply packet. VPP LISP installs a FIB entry specifying that packets with
+destination VM2 are to be VXLAN GPE encapsulated towards compute2. Once this
+FIB entry is installed, subsequent packets towards VM2 are automatically
+encapsulated (no further lookups are necessary until the mapping is valid).
+
+Once the first packet is actually encapsulated towards VM2 and VM2 generates a
+reply, the same process is repeated for the reverse direction.
+
 North-South Packet Flow
 =======================
 
-TODO: add description (and possibly a picture) of how forwarding works -
-    describe how packets travel in the setup
-    NOTE: could be in some different place in the document
+Consider VM1 on compute1 from the section above sends a packet to an external
+destination. VPP LISP does the mapping lookup with ODL in the same way, but it
+receives a "negative" mapping, which doesn't specify an encapsulation
+destinaiton address (RLOC). This means that packet needs to be forwarded
+"natively".
+
+As mentioned above VPP Renderer stores the "native-forward" destination with
+VPP, which is then used for delivering the packet. When the packet reaches the
+gateway, it is NATed to the outside world using simple one-to-one NAT, if VM1
+has a floating IP configured.
 
 Scenario Configuration and Deployment
 =====================================
