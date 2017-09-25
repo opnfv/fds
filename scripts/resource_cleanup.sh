@@ -199,7 +199,7 @@ clean_overcloud_resource() {
             then
                 if [[ $(grep -c vpp-exec /etc/vpp/startup.conf) -eq 0 ]]
                 then
-                    sed '/unix {/ a \ \ exec /etc/vpp/vpp-exec' /etc/vpp/startup.conf
+                    sed -i '/unix {/ a \ \ exec /etc/vpp/vpp-exec' /etc/vpp/startup.conf
                 fi
                 INTERFACES=$(grep -Eo "[^ ]*GigabitEthernet[^ ]+" /etc/vpp/vpp-exec | uniq | sort)
             else
