@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da33351e_9b237abc",
+        "filename": "docs/scenarios/os-odl-fdio-dvr-noha/scenario.description.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 3697
+      },
+      "writtenOn": "2017-09-29T11:55:00Z",
+      "side": 1,
+      "message": "Let\u0027s also add that this traffic happens in fib where the vms reside.",
+      "revId": "ac07ffa40bddd14971b180b931ba118155556ace",
+      "serverId": "bbac25d2-bf60-4904-9ba8-a72fc000d6c5",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da33351e_3b186d74",
+        "filename": "docs/scenarios/os-odl-fdio-dvr-noha/scenario.description.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 3697
+      },
+      "writtenOn": "2017-09-29T11:55:00Z",
+      "side": 1,
+      "message": "This fib entry is never there (as in external destination (such as 8.8.8.8) -\u003e external gateway in fib0). The exact mechanism probably doesn\u0027t need to here (I\u0027m not sure how it works, we need Vina or Shakib for this), so let\u0027s just describe this as packets from fib where the vm lives are native-forwarded (after the first negative lookup) to external gateway in fib0, where it is natted.",
+      "revId": "ac07ffa40bddd14971b180b931ba118155556ace",
+      "serverId": "bbac25d2-bf60-4904-9ba8-a72fc000d6c5",
+      "unresolved": false
+    }
+  ]
+}
