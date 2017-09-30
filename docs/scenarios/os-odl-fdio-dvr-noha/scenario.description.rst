@@ -81,11 +81,7 @@ servers:
   * 2 or more Computehosts. These Computehosts also serve as layer 3 gateways
     for tenant networks and provide ditributed virtual routing
 
-TODO: update the image:
-    1. Compute 0..N are gateways
-    2. NIC2 on controller is not in vpp
-
-.. image:: FDS-odl_l3-noha-overview.png
+.. image:: FDS-odl-dvr-noha-overview.png
 
 Tenant and public networking leverages FD.io/VPP. On compute nodes,
 VPP binds to both the tenant networking interface as well as the public
@@ -109,9 +105,6 @@ through VPP, providing full distributed routing. VPP provides almost all
 layer 3 services which are provided in a "vanilla" OpenStack deployment,
 including one-to-one NAT but not source NAT, as well as north-south and
 east-west traffic filtering for security purposes ("security groups").
-
-TODO: update the image:
-    1. Add External network interface to Computenode-1
 
 .. image:: FDS-L3-DVR-sample-setup.png
 
@@ -204,10 +197,7 @@ interfaces.
 
 The picture below shows the key components.
 
-TODO: update the image:
-    1. Add LISP
-
-.. image:: FDS-basic-components.jpg
+.. image:: FDS-basic-components.png
 
 Neutron Port Callflow
 =====================
@@ -244,10 +234,21 @@ To provide a better understanding how the above mentioned components interact
 with each other, the following diagram shows how the example of creating a
 vhost-user port on VPP through Openstack Neutron:
 
+TODO: Add LISP components to diagram
+
 .. image:: FDS-simple-callflow.png
 
 DHCP Packet Flow
 ================
+
+DHCP traffic from a VM first arrives at vhost-user port in VPP, which is
+configured as unnumbered with ip of loopback interface (which corresponds
+with tenant interface port) for the VRF where the VM resides.
+DHCP proxy is configured to relay DHCP packets to the DHCP server created by
+neutron-dhcp-agent running on the node where the VM was created. DHCP relay
+sets the destination ip to the ip of the DHCP server and source ip to the
+loopback ip. Opendaylight configures a route for the DHCP server, sending
+packets to the tap port which is connected to the DHCP namespace.
 
 East-West Packet Flow
 =====================
