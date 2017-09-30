@@ -204,13 +204,12 @@ interfaces.
 
 The picture below shows the key components.
 
-TODO: update the image:
-    1. Add LISP
-
 .. image:: FDS-basic-components.jpg
 
 Neutron Port Callflow
 =====================
+
+TODO: Add LISP to description below.
 
 When a port is created or updated, Neutron sends data to ODL Neutron Northbound
 which contain UUID, along with a host-id such as
