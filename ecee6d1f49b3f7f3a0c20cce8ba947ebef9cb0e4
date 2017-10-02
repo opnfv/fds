@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da33351e_2a72d110",
+        "filename": "docs/scenarios/os-odl-fdio-dvr-noha/scenario.description.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 7023
+      },
+      "writtenOn": "2017-10-02T08:21:20Z",
+      "side": 1,
+      "message": "I added LISP to the third paragraph in https://gerrit.opnfv.org/gerrit/#/c/43115/  Is more detail needed?",
+      "revId": "ecee6d1f49b3f7f3a0c20cce8ba947ebef9cb0e4",
+      "serverId": "bbac25d2-bf60-4904-9ba8-a72fc000d6c5",
+      "unresolved": false
+    }
+  ]
+}
