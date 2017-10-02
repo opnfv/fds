@@ -214,8 +214,6 @@ To provide a better understanding how the above mentioned components interact
 with each other, the following diagram shows how the example of creating a
 vhost-user port on VPP through Openstack Neutron:
 
-TODO: Add LISP components to diagram
-
 .. image:: FDS-simple-callflow.png
 
 DHCP Packet Flow
