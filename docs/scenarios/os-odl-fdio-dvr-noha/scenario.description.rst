@@ -275,6 +275,8 @@ encapsulated (no further lookups are necessary until the mapping is valid).
 Once the first packet is actually encapsulated towards VM2 and VM2 generates a
 reply, the same process is repeated for the reverse direction.
 
+.. image:: FDS-east-west-traffic.png
+
 North-South Packet Flow
 =======================
 
