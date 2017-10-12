@@ -165,10 +165,12 @@ clean_overcloud_resource() {
             then
                 echo "$HOSTNAME: found running odl, cleaning up"
                 ODL_DIR=/opt/opendaylight
+                echo "$HOSTNAME: stopping odl"
+                service opendaylight stop &> /dev/null
                 rm -rf $ODL_DIR/data/ $ODL_DIR/journal/ $ODL_DIR/snapshots/ \
                     $ODL_DIR/instances/ $ODL_DIR/cache/
-                echo "$HOSTNAME: restarting odl"
-                service opendaylight restart &> /dev/null
+                echo "$HOSTNAME: starting odl"
+                service opendaylight start &> /dev/null
                 ODL_RESTARTED=True
             else
                 case $(ps aux | grep karaf | grep -c -v grep) in
