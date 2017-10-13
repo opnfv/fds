@@ -253,8 +253,8 @@ clean_overcloud_resource() {
             sleep 1
             service honeycomb start &> /dev/null
             echo "$HOSTNAME: starting honeycomb"
-            HC_IP=$(grep -r restconf-binding-address /opt/honeycomb/config/ | grep -Eo "$IPV4_REGEX")
-            HC_PORT=$(grep -r restconf-port /opt/honeycomb/config/ | grep -Eo [0-9]+)
+            HC_IP=$(grep -rhPo "restconf-binding-address[^0-9]*\K($IPV4_REGEX)" /opt/honeycomb/config/)
+            HC_PORT=$(grep -rhPo "restconf-port[^0-9]*\K([0-9]*)" /opt/honeycomb/config/)
             for i in $(seq 1 $FDIO_TIMEOUT)
             do
                 sleep 1
