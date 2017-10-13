@@ -25,9 +25,10 @@ class FDSLibrary():
         if os.getenv('OS_IDENTITY_API_VERSION') == '3':
             auth = v3.Password(auth_url=os.getenv('OS_AUTH_URL'),
                                username=os.getenv('OS_USERNAME'),
+                               user_domain_name=os.getenv('OS_USER_DOMAIN_NAME'),
                                password=os.getenv('OS_PASSWORD'),
-                               project_id=os.getenv('OS_PROJECT_ID'),
-                               user_domain_name=os.getenv('OS_USER_DOMAIN_NAME'))
+                               project_name=os.getenv('OS_PROJECT_NAME'),
+                               project_domain_name=os.getenv('OS_PROJECT_DOMAIN_NAME'))
         else:
             auth = v2.Password(username=os.getenv('OS_USERNAME'),
                                password=os.getenv('OS_PASSWORD'),

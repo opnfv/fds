@@ -23,7 +23,7 @@ port2_name = 'fds_smoke_port2_' + run_uuid
 subnet_cidr = '192.168.10.0/24'
 vm_flavor = 'nfv-fds'
 vm_image = 'cirros-0.3.5'
-image_path = '/home/opnfv/functest/data/cirros-0.3.5-x86_64-disk.img'
+image_path = '/home/opnfv/functest/images/cirros-0.3.5-x86_64-disk.img'
 userdata1 = "#!/bin/sh\n\nsudo ip a add {}/24 dev eth0\n while true; do echo curl_passed | nc -l -p 80; done\n".format(vm1_address)
 userdata2 = "#!/bin/sh\n\nsudo ip a add {}/24 dev eth0\nwhile true; do\n ping -c 1 {} 2>&1 >/dev/null\n " \
             "RES=$?\n if [ \"Z$RES\" = \"Z0\" ] ; then\n  echo 'ping PASSED'\n break\n else\n  echo " \
