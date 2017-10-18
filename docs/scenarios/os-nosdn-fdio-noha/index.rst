@@ -9,7 +9,7 @@
 Fast Data Stacks Scenario: os-nosdn-fdio-noha Overview and Description
 **********************************************************************
 
-Scenario: "OpenStack - FD.io" (apex-os-nosdn-fdio-noha)
+Scenario: "OpenStack - FD.io" (os-nosdn-fdio-noha)
 is a scenario developed as part of the FastDataStacks
 OPNFV project.
 
