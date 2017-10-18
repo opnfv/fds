@@ -15,7 +15,8 @@ are:
  - APEX (TripleO) installer (please also see APEX installer documentation)
  - Openstack (in HA configuration)
  - FD.io/VPP virtual forwarder for tenant networking
- - etcd, which is the VPP ML2 mechanism driver's distributed key-value store, in clustered mode
+ - networking-vpp (Neutron ML2 mechanism driver for FD.io/VPP)
+ - etcd (networking-vpp's distributed key-value store) in clustered mode
 
 Introduction
 ============
@@ -25,7 +26,7 @@ require a "fast data stack" solution that provides both carrier grade
 forwarding performance, scalability and open extensibility.
 
 A key component of any NFV solution is the virtual forwarder, which needs to be
-a feature rich, high performance, highly scale virtual switch-router. It needs
+a feature rich, high performance, highly scalable virtual switch-router. It needs
 to leverage hardware accelerators when available and run in user space.  In
 addition, it should be modular and easily extensible. The Vector Packet
 Processor (VPP) supplied by the FD.io project meets these needs, in that
@@ -43,23 +44,25 @@ servers:
   * 3 Controlhosts, which run the Overcloud and Openstack services as well as the VPP ML2 etcd cluster
   * 2 or more Computehosts
 
-.. image:: FDS-nosdn-overview.png
 
 Tenant networking leverages FD.io/VPP. Open VSwitch (OVS) is used for all other
 connectivity, in particular the connectivity to public networking / the
 Internet (i.e. br-ext) is performed via OVS as in any standard OpenStack
-deployment. A VPP management agent is used to setup and manage layer 2
-networking for the scenario. Neutron ML2 plugin is configured to use
-the VPP ML2 networking mechanism driver. Tenant networking can either leverage
-VLANs or plain interfaces (flat networks). Layer 3 connectivity for a tenant
-network is provided centrally via qrouter on the control node. As in a
-standard OpenStack deployment, the Layer3 agent configures the qrouter and
-associated rulesets for security (security groups) and NAT (floating IPs).
-Public IP network connectivity for a tenant network is provided by
-interconnecting the VPP-based bridge domain representing the tenant network to
-qrouter using a tap interface.
+deployment. Neutron ML2 plugin is configured to use networking-vpp, the ML2-VPP
+networking mechanism driver. Networking-vpp also provides the VPP management
+agent used to setup and manage layer 2 networking for the scenario. Tenant
+networking can either leverage VLANs or plain interfaces. Layer 3 connectivity
+for a tenant network is provided centrally via qrouter on the control node. As
+in a standard OpenStack deployment, the Layer3 agent configures the qrouter and
+associated rulesets for security (security groups) and NAT (floating IPs). Public
+IP network connectivity for a tenant network is provided by interconnecting the
+VPP-based bridge domain representing the tenant network to qrouter using a tap
+interface. 
 
 The setup is depicted below:
+
+
+.. image:: FDS-nosdn-overview.png
 
 Features of the scenario
 ------------------------
@@ -86,7 +89,7 @@ The os-nosdn-fdio-ha scenario combines components from two key open
 source projects: OpenStack and Fast Data (FD.io).  In order to make Fast Data
 (FD.io) networking available to this scenario, an ML2 mechanism driver and a
 light-weight control plane agent for VPP forwarder has been created. For
-details see also https://git.openstack.org/cgit/openstack/networking-vpp/
+details see also https://github.com/openstack/networking-vpp.
 
 Networking-vpp provides a Neutron ML2 mechanism driver to bring the advantages
 of VPP to OpenStack deployments.It uses an etcd cluster on the control node to
@@ -110,33 +113,7 @@ Scenario Configuration
 To enable the "os-nosdn-fdio-ha" scenario check the appropriate settings
 in the APEX configuration files. Those are typically found in /etc/opnfv-apex.
 
-Use the file "os-nosdn-fdio-ha.yaml"::
-
-  global_params:
-    ha_enabled: true
-
-  deploy_options:
-    sdn_controller: false
-    sdn_l3: false
-    tacker: true
-    congress: true
-    sfc: false
-    vpn: false
-    vpp: true
-    dataplane: fdio
-    performance:
-      Controller:
-        vpp:
-          uio-driver: uio_pci_generic
-      Compute:
-        kernel:
-          hugepagesz: 2M
-          hugepages: 2048
-          intel_iommu: 'on'
-          iommu: pt
-          isolcpus: 1,2
-        vpp:
-          uio-driver: uio_pci_generic
+Use the file "os-nosdn-fdio-ha.yaml".
 
 
 Validated deployment environments
@@ -166,8 +143,7 @@ References
   * FastDataStacks OPNFV project wiki: https://wiki.opnfv.org/display/fds
   * Fast Data (FD.io): https://fd.io/
   * FD.io Vector Packet Processor (VPP): https://wiki.fd.io/view/VPP
-  * ML2 VPP mechanisms driver: https://git.openstack.org/cgit/openstack/networking-vpp/
-  * OPNFV Danube release - more information: http://www.opnfv.org/danube
+  * ML2 VPP mechanism driver: https://github.com/openstack/networking-vpp
   * Networking-vpp launchpad (ticket tracker) https://launchpad.net/networking-vpp
   * Networking-vpp Wiki: https://wiki.openstack.org/wiki/Networking-vpp/
   * APEX (TripleO based) installer: https://wiki.opnfv.org/display/apex/Apex
