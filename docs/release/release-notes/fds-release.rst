@@ -22,28 +22,6 @@ Abstract
 
 This document describes the release notes of FastDataStacks project.
 
-
-Version history
-===============
-
-+------------+----------+------------------+------------------------------+
-| **Date**   | **Ver.** | **Author**       | **Comment**                  |
-|            |          |                  |                              |
-+------------+----------+------------------+------------------------------+
-| 2017-10-18 | 4.0.0    | Juraj Linkes     | FastDataStacks for Euphrates |
-|            |          | (Cisco)          | release                      |
-+------------+----------+------------------+------------------------------+
-| 2017-07-13 | 3.0.0    | Juraj Linkes     | FastDataStacks for Danube    |
-|            |          | (Cisco)          | 3.0 release                  |
-+------------+----------+------------------+------------------------------+
-| 2017-05-02 | 2.0.0    | Frank Brockners  | FastDataStacks for Danube    |
-|            |          | (Cisco)          | 2.0 release                  |
-+------------+----------+------------------+------------------------------+
-| 2017-03-30 | 1.0.0    | Frank Brockners  | FastDataStacks for Danube    |
-|            |          | (Cisco)          | 1.0 release                  |
-+------------+----------+------------------+------------------------------+
-
-
 OPNFV Euphrates Release
 =======================
 
@@ -128,6 +106,10 @@ In release Euphrates, FastDataStacks releases the following scenarios:
   OpenStack (in a high-availability setup),
   OpenDaylight (for Layer 2 and Layer 3 networking control in clustered mode),
   HoneyComb, VPP
+ * `os-odl-fdio_dvr-noha <http://docs.opnfv.org/en/stable-euphrates/submodules/fds/docs/scenarios/os-odl-fdio-dvr-noha/index.html>`_:
+  OpenStack,
+  OpenDaylight (for Layer 3 networking control; there is not Layer 2 configuration),
+  HoneyComb, VPP
 
 
 All of the scenarios are installed using the APEX installer.
@@ -208,4 +190,26 @@ Scenario os-odl-fdio-ha known issues in Euphrates
   Undercloud iptables rules are messed up post a power outage
 * `APEX-532 <https://jira.opnfv.org/browse/APEX-532>`_:
   Add nat undercloud configuration for fdio scenarios
+
+Scenario os-odl-fdio_dvr-noha known issues in Euphrates
+-------------------------------------------------
+
+* `FDS-481 <https://jira.opnfv.org/browse/FDS-481>`_:
+  VPP hangs on blocking read from vhost user interface
+* `FDS-482 <https://jira.opnfv.org/browse/FDS-482>`_:
+  Live migration not supported
+* `FDS-484 <https://jira.opnfv.org/browse/FDS-484>`_:
+  snaps_smoke failures
+* `FDS-485 <https://jira.opnfv.org/browse/FDS-485>`_:
+  LISP errors, improvements and cleanup in GBP
+* `APEX-468 <https://jira.opnfv.org/browse/APEX-468>`_:
+  Mariadb/mysqld fails to start post a reboot
+* `APEX-469 <https://jira.opnfv.org/browse/APEX-469>`_:
+  Undercloud iptables rules are messed up post a power outage
+* `APEX-532 <https://jira.opnfv.org/browse/APEX-532>`_:
+  Add nat undercloud configuration for fdio scenarios
+* `HC2VPP-249 <https://jira.fd.io/browse/HC2VPP-249>`_:
+  Route can be created even if output interface does not exist
+* `HC2VPP-250 <https://jira.fd.io/browse/HC2VPP-250>`_:
+  Cannot add EID if it's already present in oprational DS
 
