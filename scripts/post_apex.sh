@@ -56,9 +56,15 @@ do
     echo "Copying overcloudrc to $node_name"
     scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $overcloudrc_path heat-admin@$node_ip:. &> /dev/null
     ssh -oStrictHostKeyChecking=no heat-admin@$node_ip 'sudo cp /home/heat-admin/overcloudrc /root' &> /dev/null
-    echo "Cloning fds repo on $node_name to $overcloud_fds_repo_loc"
-    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $node_name \
-        'git clone https://gerrit.opnfv.org/gerrit/p/fds.git $overcloud_fds_repo_loc' &> /dev/null
+    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $node_name ping -c 3 8.8.8.8 > /dev/null
+    if [[ $? -eq 0 ]]
+    then
+        echo "Cloning fds repo on $node_name to $overcloud_fds_repo_loc"
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $node_name \
+            'git clone https://gerrit.opnfv.org/gerrit/p/fds.git $overcloud_fds_repo_loc' &> /dev/null
+        echo "Installing vim on $node_name"
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $node_name yum -y install vim &> /dev/null
+    fi
     if [[ $(ssh -oStrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$node_ip \
         'grep -c ". /root/overcloudrc" /root/.bashrc' 2> /dev/null) -eq 0 ]]
     then
