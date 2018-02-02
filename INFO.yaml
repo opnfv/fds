@@ -1,0 +1,64 @@
+---
+project: 'FastDataStacks'
+project_creation_date: 'March 29, 2016 '
+project_category: ''
+lifecycle_state: 'Incubation'
+project_lead: &opnfv_fds_ptl
+    name: 'Frank Brockners'
+    email: 'fbrockne@cisco.com'
+    company: 'cisco'
+    id: 'brockners'
+    timezone: ''
+primary_contact: *opnfv_fds_ptl
+issue_tracking:
+    type: 'jira'
+    url: 'https://jira.opnfv.org/projects/FDS'
+    key: 'FDS'
+mailing_list:
+    type: 'mailman2'
+    url: 'opnfv-tech-discuss@lists.opnfv.org'
+    tag: '[fds]'
+realtime_discussion:
+    type: irc
+    server: 'freenode.net'
+    channel: '#opnfv-fds'
+meetings:
+    - type: 'gotomeeting+irc'
+      agenda:  # eg: 'https://wiki.opnfv.org/display/'
+      url:  # eg: 'https://global.gotomeeting.com/join/819733085'
+      server: 'freenode.net'
+      channel: '#opnfv-meeting'
+      repeats: 'weekly'
+      time:  # eg: '16:00 UTC'
+repositories:
+    - 'fds'
+committers:
+    - <<: *opnfv_fds_ptl
+    - name: 'Dan Radez'
+      email: 'dradez@redhat.com'
+      company: 'redhat'
+      id: 'radez'
+      timezone: ''
+    - name: 'Tim Rozet'
+      email: 'trozet@redhat.com'
+      company: 'redhat'
+      id: 'trozet'
+      timezone: ''
+    - name: 'Juraj Linkeš'
+      email: 'juraj.linkes@pantheon.tech'
+      company: 'pantheon'
+      id: 'juraj.linkes'
+      timezone: ''
+    - name: 'Ashlee Young'
+      email: 'ash@yunify.org'
+      company: 'yunify'
+      id: 'im2bz2pee'
+      timezone: ''
+
+tsc:
+    # yamllint disable rule:line-length
+    approval: 'https//wiki.opnfv.org/display/meetings/TSC#TSC-March29,2016'
+    # yamllint enable rule:line-length
+    changes:
+        - type: 'promotion'
+          link: 'n/a'
