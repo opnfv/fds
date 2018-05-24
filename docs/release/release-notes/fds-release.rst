@@ -6,15 +6,15 @@
 License
 =======
 
-OPNFV Euphrates release notes for FastDataStacks
+OPNFV Fraser release notes for FastDataStacks
 
-OPNFV Euphrates release notes for FastDataStacks
+OPNFV Fraser release notes for FastDataStacks
 are licensed under a Creative Commons Attribution 4.0 International License.
 You should have received a copy of the license along with this.
 If not, see <http://creativecommons.org/licenses/by/4.0/>.
 
 ===================================================
-OPNFV Euphrates release notes for FastDataStacks
+OPNFV Fraser release notes for FastDataStacks
 ===================================================
 
 Abstract
@@ -22,7 +22,7 @@ Abstract
 
 This document describes the release notes of FastDataStacks project.
 
-OPNFV Euphrates Release
+OPNFV Fraser Release
 =======================
 
 
@@ -63,9 +63,8 @@ FastDataStacks is a great example of OPNFV’s modus operandi: create, compose,
 deploy, test, iterate.
 
 The key ingredient for all these scenarios is the data-plane forwarding and
-control infrastructure supplied by FD.io, i.e. VPP and Honeycomb along with
-OpenStack as the VM manager. In addition, OpenDaylight as a network controller
-plays a key role in many of the scenarios built by FastDataStacks.
+control infrastructure supplied by FD.io, i.e. VPP and networking-vpp along with
+OpenStack as the VM manager.
 
 Release Data
 ============
@@ -74,142 +73,90 @@ Release Data
 | **Project**                          | FastDataStacks                       |
 |                                      |                                      |
 +--------------------------------------+--------------------------------------+
-| **Repo/tag**                         | fds/opnfv-5.1.0                      |
+| **Repo/tag**                         | fds/opnfv-6.1.0                      |
 |                                      |                                      |
 +--------------------------------------+--------------------------------------+
-| **Release designation**              | 5.1.0                                |
+| **Release designation**              | 6.1.0                                |
 |                                      |                                      |
 +--------------------------------------+--------------------------------------+
-| **Release date**                     | 2017-12-15                           |
+| **Release date**                     | 2018-05-25                           |
 |                                      |                                      |
 +--------------------------------------+--------------------------------------+
-| **Purpose of the delivery**          | OPNFV Euphrates release              |
+| **Purpose of the delivery**          | OPNFV Fraser release                 |
 |                                      |                                      |
 +--------------------------------------+--------------------------------------+
 
-FastDataStacks Scenarios in Euphrates
+FastDataStacks Scenarios in Fraser
 ======================================
 
-In release Euphrates, FastDataStacks releases the following scenarios:
+In release Fraser, FastDataStacks releases the following scenarios:
 
- * `os-nosdn-fdio-noha <http://docs.opnfv.org/en/stable-euphrates/submodules/fds/docs/scenarios/os-nosdn-fdio-noha/index.html>`_:
+ * `os-nosdn-fdio-noha <http://docs.opnfv.org/en/stable-fraser/submodules/fds/docs/scenarios/os-nosdn-fdio-noha/index.html>`_:
   OpenStack (with Neutron networking-vpp mechanism driver),
   VPP
- * `os-nosdn-fdio-ha <http://docs.opnfv.org/en/stable-euphrates/submodules/fds/docs/scenarios/os-nosdn-fdio-ha/index.html>`_:
+ * `os-nosdn-fdio-ha <http://docs.opnfv.org/en/stable-fraser/submodules/fds/docs/scenarios/os-nosdn-fdio-ha/index.html>`_:
   OpenStack (in a high-availability setup, with Neutron networking-vpp mechanism driver),
   VPP
- * `os-odl-fdio-noha <http://docs.opnfv.org/en/stable-euphrates/submodules/fds/docs/scenarios/os-odl-fdio-noha/index.html>`_:
-  OpenStack,
-  OpenDaylight (for Layer 2 and Layer 3 networking control),
-  HoneyComb, VPP
- * `os-odl-fdio-ha <http://docs.opnfv.org/en/stable-euphrates/submodules/fds/docs/scenarios/os-odl-fdio-ha/index.html>`_:
-  OpenStack (in a high-availability setup),
-  OpenDaylight (for Layer 2 and Layer 3 networking control in clustered mode),
-  HoneyComb, VPP
- * `os-odl-fdio_dvr-noha <http://docs.opnfv.org/en/stable-euphrates/submodules/fds/docs/scenarios/os-odl-fdio-dvr-noha/index.html>`_:
-  OpenStack,
-  OpenDaylight (for Layer 3 networking control; there is no Layer 2 configuration),
-  HoneyComb, VPP
 
-
-All of the scenarios are installed using the APEX installer.
+Both scenarios are installed using the APEX installer.
 
 Known Issues/Restrictions
 =========================
 
-Scenario os-nosdn-fdio-noha known issues in Euphrates
+Scenario os-nosdn-fdio-noha known issues in Fraser
 -----------------------------------------------------
 
 * `FDS-156 <https://jira.opnfv.org/browse/FDS-156>`_:
   Race conditions for network-vif-plugged notification
 * `FDS-160 <https://jira.opnfv.org/browse/FDS-160>`_:
   Vlan fix on controller
-* `FDS-401 <https://jira.opnfv.org/browse/FDS-401>`_:
-  SimpleHealthCheck fails in snaps_smoke
-* `FDS-483 <https://jira.opnfv.org/browse/FDS-483>`_:
-  Live migration not supported
+* `FDS-491 <https://jira.opnfv.org/browse/FDS-491>`_:
+  neutron trunk port feature is not supported in networking-vpp
+* `FDS-492 <https://jira.opnfv.org/browse/FDS-492>`_:
+  VxLAN is not yet fully functional
+* `FDS-493 <https://jira.opnfv.org/browse/FDS-493>`_:
+  snaps_smoke has some failures around floating ip
+* `FDS-494 <https://jira.opnfv.org/browse/FDS-494>`_:
+  refstack has random failures
+* `FDS-495 <https://jira.opnfv.org/browse/FDS-495>`_:
+  tempest test cases test_network_basic_ops and test_server_basic_ops fail but
+  pass when run standalone
+* `FDS-496 <https://jira.opnfv.org/browse/FDS-496>`_:
+  NAT does not work with VPP 18.04 in some scenarios
+* `FUNCTEST-970 <https://jira.opnfv.org/browse/FUNCTEST-970>`_:
+  vping_ssh/vping_userdata fail with fraser
+* `APEX-593 <https://jira.opnfv.org/browse/APEX-593>`_:
+  cirros instance stays stuck in boot for a very long time causing functest
+  testcases to timeout
 
-Scenario os-nosdn-fdio-ha known issues in Euphrates
+Scenario os-nosdn-fdio-ha known issues in Fraser
 ---------------------------------------------------
 
 * `FDS-156 <https://jira.opnfv.org/browse/FDS-156>`_:
   Race conditions for network-vif-plugged notification
 * `FDS-160 <https://jira.opnfv.org/browse/FDS-160>`_:
   Vlan fix on controller
-* `FDS-371 <https://jira.opnfv.org/browse/FDS-371>`_:
-  Tempest_full_parallel failures due to DBDeadlock error
 * `FDS-399 <https://jira.opnfv.org/browse/FDS-399>`_:
   Neutron ports are not marked ACTIVE
 * `FDS-400 <https://jira.opnfv.org/browse/FDS-400>`_:
   Race condition between VPP ML2 agent and tempest code
-* `FDS-401 <https://jira.opnfv.org/browse/FDS-401>`_:
-  SimpleHealthCheck fails in snaps_smoke
-* `FDS-483 <https://jira.opnfv.org/browse/FDS-483>`_:
-  Live migration not supported
+* `FDS-491 <https://jira.opnfv.org/browse/FDS-491>`_:
+  neutron trunk port feature is not supported in networking-vpp
+* `FDS-492 <https://jira.opnfv.org/browse/FDS-492>`_:
+  VxLAN is not yet fully functional
+* `FDS-493 <https://jira.opnfv.org/browse/FDS-493>`_:
+  snaps_smoke has some failures around floating ip
+* `FDS-494 <https://jira.opnfv.org/browse/FDS-494>`_:
+  refstack has random failures
+* `FDS-495 <https://jira.opnfv.org/browse/FDS-495>`_:
+  tempest test cases test_network_basic_ops and test_server_basic_ops fail but
+  pass when run standalone
+* `FDS-496 <https://jira.opnfv.org/browse/FDS-496>`_:
+  NAT does not work with VPP 18.04 in some scenarios
+* `FUNCTEST-970 <https://jira.opnfv.org/browse/FUNCTEST-970>`_:
+  vping_ssh/vping_userdata fail with fraser
+* `APEX-593 <https://jira.opnfv.org/browse/APEX-593>`_:
+  cirros instance stays stuck in boot for a very long time causing functest
+  testcases to timeout
 * `APEX-468 <https://jira.opnfv.org/browse/APEX-468>`_:
   Mariadb/mysqld fails to start post a reboot
-* `APEX-469 <https://jira.opnfv.org/browse/APEX-469>`_:
-  Undercloud iptables rules are messed up post a power outage
-* `FUNCTEST-841 <https://jira.opnfv.org/browse/FUNCTEST-841>`_:
-  Cloudify_ims testcase keeps timing out
-* `ORCEHSTRA-13 <https://jira.opnfv.org/browse/ORCEHSTRA-13>`_:
-  Internal Server Error/java.lang.OutOfMemoryError: Java heap space
-
-Scenario os-odl-fdio-noha known issues in Euphrates
----------------------------------------------------
-
-* `FDS-476 <https://jira.opnfv.org/browse/FDS-476>`_:
-  Race conditions in GBP
-* `FDS-481 <https://jira.opnfv.org/browse/FDS-481>`_:
-  VPP hangs on blocking read from vhost user interface
-* `FDS-482 <https://jira.opnfv.org/browse/FDS-482>`_:
-  Live migration not supported
-* `FDS-484 <https://jira.opnfv.org/browse/FDS-484>`_:
-  snaps_smoke failures
-* `APEX-468 <https://jira.opnfv.org/browse/APEX-468>`_:
-  Mariadb/mysqld fails to start post a reboot
-* `APEX-469 <https://jira.opnfv.org/browse/APEX-469>`_:
-  Undercloud iptables rules are messed up post a power outage
-* `APEX-532 <https://jira.opnfv.org/browse/APEX-532>`_:
-  Add nat undercloud configuration for fdio scenarios
-
-Scenario os-odl-fdio-ha known issues in Euphrates
--------------------------------------------------
-
-* `FDS-476 <https://jira.opnfv.org/browse/FDS-476>`_:
-  Race conditions in GBP
-* `FDS-481 <https://jira.opnfv.org/browse/FDS-481>`_:
-  VPP hangs on blocking read from vhost user interface
-* `FDS-482 <https://jira.opnfv.org/browse/FDS-482>`_:
-  Live migration not supported
-* `FDS-484 <https://jira.opnfv.org/browse/FDS-484>`_:
-  snaps_smoke failures
-* `APEX-468 <https://jira.opnfv.org/browse/APEX-468>`_:
-  Mariadb/mysqld fails to start post a reboot
-* `APEX-469 <https://jira.opnfv.org/browse/APEX-469>`_:
-  Undercloud iptables rules are messed up post a power outage
-* `APEX-532 <https://jira.opnfv.org/browse/APEX-532>`_:
-  Add nat undercloud configuration for fdio scenarios
-
-Scenario os-odl-fdio_dvr-noha known issues in Euphrates
--------------------------------------------------
-
-* `FDS-481 <https://jira.opnfv.org/browse/FDS-481>`_:
-  VPP hangs on blocking read from vhost user interface
-* `FDS-482 <https://jira.opnfv.org/browse/FDS-482>`_:
-  Live migration not supported
-* `FDS-484 <https://jira.opnfv.org/browse/FDS-484>`_:
-  snaps_smoke failures
-* `FDS-485 <https://jira.opnfv.org/browse/FDS-485>`_:
-  LISP errors, improvements and cleanup in GBP
-* `APEX-468 <https://jira.opnfv.org/browse/APEX-468>`_:
-  Mariadb/mysqld fails to start post a reboot
-* `APEX-469 <https://jira.opnfv.org/browse/APEX-469>`_:
-  Undercloud iptables rules are messed up post a power outage
-* `APEX-532 <https://jira.opnfv.org/browse/APEX-532>`_:
-  Add nat undercloud configuration for fdio scenarios
-* `HC2VPP-249 <https://jira.fd.io/browse/HC2VPP-249>`_:
-  Route can be created even if output interface does not exist
-* `HC2VPP-250 <https://jira.fd.io/browse/HC2VPP-250>`_:
-  Cannot add EID if it's already present in operational DS
-
