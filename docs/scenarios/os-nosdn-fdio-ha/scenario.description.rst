@@ -15,7 +15,7 @@ are:
  - APEX (TripleO) installer (please also see APEX installer documentation)
  - Openstack (in HA configuration)
  - FD.io/VPP virtual forwarder for tenant networking
- - networking-vpp (Neutron ML2 mechanism driver for FD.io/VPP)
+ - networking-vpp (Neutron ML2 mechanism driver and L3 plugin for FD.io/VPP)
  - etcd (networking-vpp's distributed key-value store) in clustered mode
 
 Introduction
@@ -45,19 +45,17 @@ servers:
   * 2 or more Computehosts
 
 
-Tenant networking leverages FD.io/VPP. Open VSwitch (OVS) is used for all other
-connectivity, in particular the connectivity to public networking / the
-Internet (i.e. br-ext) is performed via OVS as in any standard OpenStack
-deployment. Neutron ML2 plugin is configured to use networking-vpp, the ML2-VPP
-networking mechanism driver. Networking-vpp also provides the VPP management
-agent used to setup and manage layer 2 networking for the scenario. Tenant
-networking can either leverage VLANs or plain interfaces. Layer 3 connectivity
-for a tenant network is provided centrally via qrouter on the control node. As
-in a standard OpenStack deployment, the Layer3 agent configures the qrouter and
-associated rulesets for security (security groups) and NAT (floating IPs). Public
-IP network connectivity for a tenant network is provided by interconnecting the
-VPP-based bridge domain representing the tenant network to qrouter using a tap
-interface.
+Tenant as well as public networking leverages FD.io/VPP. Neutron ML2 plugin is
+configured to use networking-vpp as the mechanism driver for VPP.
+Networking-vpp also provides the VPP management agent used to setup and manage
+layer 2 networking for the scenario. Tenant networking can either leverage
+VLANs or plain interfaces. Layer 3 connectivity for a tenant network is
+provided by the networking-vpp L3 plugin. The networking-vpp agent, which also
+acts as the L3 agent, configures the necessary artifacts in VPP for providing
+layer 3 connectivity. Public IP network connectivity for a tenant network is
+provided by interconnecting the VPP-based bridge domain representing the
+tenant network to a high-performance VPP tapv2 interface which in turn is
+bridged to a linux bridge, br-ex, on the network node.
 
 The setup is depicted below:
 
@@ -72,11 +70,10 @@ Main features of the "os-nosdn-fdio-ha" scenario:
   * Automated installation using the APEX installer
   * Fast and scalable tenant networking using FD.io/VPP as forwarder
   * Layer 2 networking using VLANs, managed and controlled
-    through the VPP ML2 plugin
-  * Layer 3 connectivitiy for tenant networks supplied centrally
-    on the Control node through standard OpenStack mechanisms.
-    All layer 3 features apply, including floating IPs (i.e. NAT)
-    and security groups
+    through the VPP ML2 plugin and the agent
+  * Layer 3 connectivitiy for tenant networks is provided through the
+    networking-vpp L3 plugin and agent on the Control/network node. All layer 3
+    features apply, including floating IPs (i.e. NAT) and security groups
   * DHCP server for tenant instances provided using the standard
     OpenStack dnsmasq server
   * OpenStack high availability
@@ -92,7 +89,7 @@ light-weight control plane agent for VPP forwarder has been created. For
 details see also https://github.com/openstack/networking-vpp.
 
 Networking-vpp provides a Neutron ML2 mechanism driver to bring the advantages
-of VPP to OpenStack deployments.It uses an etcd cluster on the control node to
+of VPP to OpenStack deployments. It uses an etcd cluster on the control node to
 keep track of the compute nodes, agent state and port bindings/unbindings.
 
 It's been written to be as simple and readable as possible, which means it's
