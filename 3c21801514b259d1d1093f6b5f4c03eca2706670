@@ -1,0 +1,8 @@
+Code-Review+1: Jerome Tollet <jtollet@cisco.com>
+Code-Review+2: Frank Brockners <fbrockne@cisco.com>
+Verified+1: Frank Brockners <fbrockne@cisco.com>
+Submitted-by: Frank Brockners <fbrockne@cisco.com>
+Submitted-at: Mon, 28 May 2018 08:35:15 +0000
+Reviewed-on: https://gerrit.opnfv.org/gerrit/57921
+Project: fds
+Branch: refs/heads/stable/fraser
