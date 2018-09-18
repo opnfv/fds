@@ -3,3 +3,5 @@
 testing/robot/log.html
 testing/robot/output.xml
 testing/robot/report.html
+.tox
+docs/_build/*
