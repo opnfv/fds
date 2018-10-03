@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a682502_a5522511",
+        "filename": "docs/index.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 334
+      },
+      "writtenOn": "2018-10-03T18:22:02Z",
+      "side": 1,
+      "message": "should this be FDS?",
+      "range": {
+        "startLine": 9,
+        "startChar": 1,
+        "endLine": 9,
+        "endChar": 33
+      },
+      "revId": "a1c56242201481f1485d81ebb927822e237ca0d2",
+      "serverId": "bbac25d2-bf60-4904-9ba8-a72fc000d6c5",
+      "unresolved": false
+    }
+  ]
+}
