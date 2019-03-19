@@ -34,25 +34,10 @@ repositories:
     - 'fds'
 committers:
     - <<: *opnfv_fds_ptl
-    - name: 'Dan Radez'
-      email: 'dradez@redhat.com'
-      company: 'redhat'
-      id: 'radez'
-      timezone: ''
-    - name: 'Tim Rozet'
-      email: 'trozet@redhat.com'
-      company: 'redhat'
-      id: 'trozet'
-      timezone: ''
     - name: 'Juraj Linkeš'
       email: 'juraj.linkes@pantheon.tech'
       company: 'pantheon'
       id: 'juraj.linkes'
-      timezone: ''
-    - name: 'Ashlee Young'
-      email: 'ash@yunify.org'
-      company: 'yunify'
-      id: 'im2bz2pee'
       timezone: ''
 
 tsc:
@@ -60,5 +45,5 @@ tsc:
     approval: 'https//wiki.opnfv.org/display/meetings/TSC#TSC-March29,2016'
     # yamllint enable rule:line-length
     changes:
-        - type: 'promotion'
-          link: 'n/a'
+        - type: 'removal'
+          link: 'https://jira.opnfv.org/browse/TSC-14'
